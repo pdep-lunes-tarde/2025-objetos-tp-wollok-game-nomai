@@ -48,10 +48,13 @@ class Brujo{
                 enemigo_mas_cercano = unEnemigo
             }
         }
-        disparos.add(new DisparoCercano ( posicion = self.position() , enemigo_fijado = enemigo_mas_cercano ))
+        const disparo = new DisparoCercano ( posicion = self.position() , enemigo_fijado = enemigo_mas_cercano )
+        disparos.add(disparo)
+        game.addVisual(disparo)
     }
 
     method disparos() = disparos
+    method removerDisparo(disparo) = disparos.remove(disparo)
 }
 
 object izquierda {
@@ -152,13 +155,14 @@ class DisparoCercano {
     const enemigo_fijado
 
     method position() = posicion
-    method image() = "pared.png"
+    method image() = "disparo_2.png"
 
     method objetivo() = enemigo_fijado
     method danio_infijido() = 10
-    method chocasteConEnemigo(enemigo){
+    method chocasteConEnemigo(enemigo, brujo){
         enemigo.restarVida(self.danio_infijido())
         game.removeVisual(self)
+        brujo.removerDisparo(self)
     }
     method movimiento(direccion) = direccion.siguientePosicion(posicion)
     method mover(){

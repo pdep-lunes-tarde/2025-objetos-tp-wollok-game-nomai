@@ -10,7 +10,7 @@ class Enemigo{
     var esta_vivo = true
     method vida() = vida
     method restarVida(danioRecibido){ 
-        if(vida > danioRecibido)
+        if(vida > danioRecibido && esta_vivo)
             vida -= danioRecibido
         else
             self.morir()

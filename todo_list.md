@@ -2,6 +2,12 @@
 
 juego "rpg" con personajes (magos) que disparan proyectiles
 
+- TODO:
+  - [ ] victoria
+    - al llegar a cierta cantidad de enemigos eliminados
+  - [ ] generacion de enemigos constante
+  - [ ] que al morir un enemigo tambien muera el disparo (error!)
+
 - [ ] enemigos que van directo al jugador
   - [ ] diferencia entre enemigos: vida, daño, velocidad
   - [ ] hombre-lobos (comun)

@@ -15,7 +15,7 @@ object brujosYdiablos {
         game.cellSize(32)
         game.ground("pasto.png")
 
-        const enemigos = [new Enemigo(posicion = new Position(x=6,y=6)), new Enemigo(posicion = new Position(x=10,y=10))]
+        const enemigos = [new Enemigo(posicion = new Position(x=12,y=12), vida = 30), new Enemigo(posicion = new Position(x=8,y=13), vida = 50)]
         const paredes = []
         new Range(start = 0, end = 15).forEach { n => 
 			paredes.add(new Pared(posicion = new Position(x=n,y=0)))
@@ -26,7 +26,8 @@ object brujosYdiablos {
         game.addVisual(brujo)
 
         game.onCollideDo(brujo, { cosa => cosa.chocasteConBrujo(brujo) })
-        brujo.disparos().forEach { disparo => game.onCollideDo(disparo.objetivo(), { objetivo => disparo.chocasteConEnemigo(objetivo) }) }
+        
+        
         keyboard.w().onPressDo {
             brujo.mover(arriba)
         }
@@ -42,7 +43,16 @@ object brujosYdiablos {
 
         game.onTick(1000, "movimiento_enemigos", { enemigos.forEach { enemigo => enemigo.moverHacia(brujo) } })
         game.onTick(200, "movimiento_hechizo", { brujo.disparos().forEach { disparo => disparo.mover() } } )
-        game.onTick(500, "disparo", { brujo.disparar(enemigos) })
+        game.schedule(5, { game.onTick(200, "checkear_balas", { 
+            brujo.disparos().forEach { 
+                disparo => 
+                game.onCollideDo(disparo, { 
+                    objetivo =>
+                    disparo.chocasteConEnemigo(objetivo, brujo)
+                }) 
+            } 
+        } ) })
+        game.onTick(2001, "disparo", { brujo.disparar(enemigos) })
     }
 
     method perder(unBrujo){
