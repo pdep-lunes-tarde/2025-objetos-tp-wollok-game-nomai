@@ -1,4 +1,5 @@
 import tp.*
+import movimiento.*
 
 class Brujo{
     var posicion
@@ -36,11 +37,13 @@ class Brujo{
         if(vida - danioRecibido > 0)
             vida = vida - danioRecibido
         else{
-            brujosYdiablos.perder(self)
+            brujosYdiablos.perder()
         }
     }
 
     method disparar(enemigos){
+        if(enemigos.size() == 0)
+            return null
         var enemigo_mas_cercano = enemigos.get(0)
         enemigos.forEach {
             unEnemigo =>
@@ -51,47 +54,16 @@ class Brujo{
         const disparo = new DisparoCercano ( posicion = self.position() , enemigo_fijado = enemigo_mas_cercano )
         disparos.add(disparo)
         game.addVisual(disparo)
+        return null
+    }
+
+    method aumentarDanioRealizado(danio){
+        danio_realizado += danio
     }
 
     method disparos() = disparos
     method removerDisparo(disparo) = disparos.remove(disparo)
 }
-
-object izquierda {
-    method horizontal() = true
-    method siguientePosicion(posicion) {
-        return posicion.left(1)
-    }
-}
-object abajo {
-    method horizontal() = false
-    method siguientePosicion(posicion) {
-        return posicion.down(1)
-    }
-}
-object arriba {
-    method horizontal() = false
-    method siguientePosicion(posicion) {
-        return posicion.up(1)
-    }
-}
-object derecha {
-    method horizontal() = true
-    method siguientePosicion(posicion) {
-        return posicion.right(1)
-    }
-}
-
-object wraparound {
-    method limitar(numero, limiteInferior, limiteSuperior) {
-        if(numero <= limiteInferior)
-            return limiteInferior
-        if(numero >= limiteSuperior)
-            return limiteSuperior - 1
-        return numero
-    }
-}
-
 
 // magias
 object randomizador{
@@ -106,22 +78,47 @@ object randomizador{
     }
 }
 
-// object disparo_cercano {
-//     method nombre() = "Misil magico"
-//     method danio() = randomizador.danio(10,3)
-// }
-// object disparo_menor_vida {
-//     method nombre() = ""
-//     method danio() = randomizador.danio(50,10)
-// }
-// object disparo_mayor_vida {
-//     method nombre() = "Anti-demonio"
-//     method danio() = randomizador.danio(20,50)
-// }
-// object disparo_aleatorio {
-//     method nombre() = "Abra Kadabra"
-//     method danio() = randomizador.danio(30,50)
-// }
+// magias
+class DisparoCercano {
+    var posicion
+    const danio_inflijido = 10
+    const enemigo_fijado
+
+    method position() = posicion
+    method image() = "disparo_2.png"
+    method objetivo() = enemigo_fijado
+    method danio_inflijido() = danio_inflijido
+
+    method chocasteConEnemigo(enemigo, enemigos, brujo){
+        enemigo.restarVida(self.danio_inflijido(), enemigos)
+        game.removeVisual(self)
+        brujo.removerDisparo(self)
+        brujo.aumentarDanioRealizado(self.danio_inflijido())
+    }
+    method chocasteConBrujo(brujo) {}
+
+    method movimiento(direccion) = direccion.siguientePosicion(posicion)
+    method mover(){
+        const direccionesPosibles = [arriba,abajo,izquierda,derecha]
+        // hace un map para conseguir todas las posiciones a las que se puede mover el enemigo
+        const posicionesPosibles = direccionesPosibles.map{ unaDireccion => self.movimiento(unaDireccion) }
+        // "contador" para conseguir la mejor posicion a la que se puede mover
+        var mejorPosicion = posicionesPosibles.get(0)
+        // "contador" para conseguir la menor distancia entre la posible posicion del enemigo y el brujo
+        var menorDistancia = mejorPosicion.distance(enemigo_fijado.position())
+
+        // itera por todas las posiciones para conseguir la mejor
+
+        posicionesPosibles.forEach { 
+            unaPosicion => 
+            if(unaPosicion.distance(enemigo_fijado.position()) < menorDistancia){
+                mejorPosicion = unaPosicion
+                menorDistancia = unaPosicion.distance(enemigo_fijado.position())
+            }
+        }
+        posicion = mejorPosicion
+    }
+}
 
 // mejoras
 // class Danio_explosivo {
@@ -148,41 +145,3 @@ object randomizador{
 //         danio_aumentado += randomizador.mejorar(maximo * 2)
 //     }
 // }
-
-class DisparoCercano {
-    var posicion
-    // const danio_infijido = 10
-    const enemigo_fijado
-
-    method position() = posicion
-    method image() = "disparo_2.png"
-
-    method objetivo() = enemigo_fijado
-    method danio_infijido() = 10
-    method chocasteConEnemigo(enemigo, brujo){
-        enemigo.restarVida(self.danio_infijido())
-        game.removeVisual(self)
-        brujo.removerDisparo(self)
-    }
-    method movimiento(direccion) = direccion.siguientePosicion(posicion)
-    method mover(){
-        const direccionesPosibles = [arriba,abajo,izquierda,derecha]
-        // hace un map para conseguir todas las posiciones a las que se puede mover el enemigo
-        const posicionesPosibles = direccionesPosibles.map{ unaDireccion => self.movimiento(unaDireccion) }
-        // "contador" para conseguir la mejor posicion a la que se puede mover
-        var mejorPosicion = posicionesPosibles.get(0)
-        // "contador" para conseguir la menor distancia entre la posible posicion del enemigo y el brujo
-        var menorDistancia = mejorPosicion.distance(enemigo_fijado.position())
-
-        // itera por todas las posiciones para conseguir la mejor
-
-        posicionesPosibles.forEach { 
-            unaPosicion => 
-            if(unaPosicion.distance(enemigo_fijado.position()) < menorDistancia){
-                mejorPosicion = unaPosicion
-                menorDistancia = unaPosicion.distance(enemigo_fijado.position())
-            }
-        }
-        posicion = mejorPosicion
-    }
-}

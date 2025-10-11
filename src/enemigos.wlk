@@ -1,6 +1,17 @@
 import src.brujo.*
-// const diablo = new Enemigo ( vida = 500, danio = 80, imagen = "diablo.png", posicion = new Position(x=6,y=6))
+import movimiento.*
+// Tipos de Enemigos:
+// hombre lobo:
+// - rareza = comun ; vida = 15 ; daño = 5 ; velocidad = 6
+// diablillo:
+// - rareza = poco-comun ; vida = 50 ; daño = 10 ; velocidad = 10 
+// vampiro:
+// - rareza = mini-jefe ; vida = 200 ; daño = 20 ; velocidad = 5 
+// diablo:
+// - rareza = jefe ; vida = 500 ; daño = 80 ; velocidad = 1 
 // const diablillo = new Enemigo ( vida = 50, danio = 10, imagen = "diablillo.png", posicion = new Position(x=10,y=10))
+// const diablo = new Enemigo ( vida = 500, danio = 80, imagen = "diablo.png", posicion = new Position(x=6,y=6))
+
 
 class Enemigo{
     var vida = 500
@@ -9,16 +20,19 @@ class Enemigo{
     var posicion
     var esta_vivo = true
     method vida() = vida
-    method restarVida(danioRecibido){ 
-        if(vida > danioRecibido && esta_vivo)
-            vida -= danioRecibido
-        else
-            self.morir()
+    method restarVida(danioRecibido, enemigos){ 
+        if(esta_vivo){
+            if(vida > danioRecibido)
+                vida -= danioRecibido
+            else
+                self.morir(enemigos)
+        }
     }
-    method morir(){
+    method morir(enemigos){
         esta_vivo = false
-        imagen = "pared.png"
-        game.schedule(500, game.removeVisual(self))
+        imagen = "muerte_2.png"
+        game.schedule(500, { => game.removeVisual(self) })
+        game.schedule(501, { => enemigos.remove(self) })
     }
     method danio() = danio
     method image() = imagen
