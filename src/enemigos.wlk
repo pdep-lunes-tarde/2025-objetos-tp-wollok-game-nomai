@@ -1,5 +1,6 @@
 import src.brujo.*
 import movimiento.*
+import wollok.game.*
 // Tipos de Enemigos:
 // hombre lobo:
 // - rareza = comun ; vida = 15 ; daño = 5 ; velocidad = 6
@@ -8,9 +9,7 @@ import movimiento.*
 // vampiro:
 // - rareza = mini-jefe ; vida = 200 ; daño = 20 ; velocidad = 5 
 // diablo:
-// - rareza = jefe ; vida = 500 ; daño = 80 ; velocidad = 1 
-// const diablillo = new Enemigo ( vida = 50, danio = 10, imagen = "diablillo.png", posicion = new Position(x=10,y=10))
-// const diablo = new Enemigo ( vida = 500, danio = 80, imagen = "diablo.png", posicion = new Position(x=6,y=6))
+// - rareza = jefe ; vida = 500 ; daño = 80 ; velocidad = 1
 
 
 class Enemigo{
@@ -18,47 +17,114 @@ class Enemigo{
     const danio = 80
     var imagen = "diablo.png"
     var posicion
-    var esta_vivo = true
+    var estaVivo = true
     method vida() = vida
     method restarVida(danioRecibido, enemigos){ 
-        if(esta_vivo){
-            if(vida > danioRecibido)
-                vida -= danioRecibido
-            else
-                self.morir(enemigos)
-        }
+        if(! estaVivo)
+            return null
+        if(vida > danioRecibido)
+            vida -= danioRecibido
+        else
+            self.morir(enemigos)
+        return null
     }
     method morir(enemigos){
-        esta_vivo = false
-        imagen = "muerte_2.png"
+        estaVivo = false
+        imagen = "muerte.png"
         game.schedule(500, { => game.removeVisual(self) })
         game.schedule(501, { => enemigos.remove(self) })
     }
     method danio() = danio
     method image() = imagen
     method position() = posicion
-    method chocasteConBrujo(brujo){
+    method position(nuevaPosicion){ 
+        posicion = nuevaPosicion 
+    }
+    method estaVivo() = estaVivo
+    method golpeasteABrujo(brujo){
         brujo.perderVida(self.danio())
     }
-    method movimiento(direccion) = direccion.siguientePosicion(posicion)
     method moverHacia(brujo){
-        const direccionesPosibles = [arriba,abajo,izquierda,derecha]
-        // hace un map para conseguir todas las posiciones a las que se puede mover el enemigo
-        const posicionesPosibles = direccionesPosibles.map{ unaDireccion => self.movimiento(unaDireccion) }
-        // "contador" para conseguir la mejor posicion a la que se puede mover
-        var mejorPosicion = posicionesPosibles.get(0)
-        // "contador" para conseguir la menor distancia entre la posible posicion del enemigo y el brujo
-        var menorDistancia = mejorPosicion.distance(brujo.position())
+        movimiento.moverHacia(self, brujo)
+    }
+}
 
-        // itera por todas las posiciones para conseguir la mejor
+object generarEnemigos {
+    method hombreLobo(){
+        const vidaHombreLobo = randomizador.estadistica(15, 5)
+        const danioHombreLobo = randomizador.estadistica(5, 2)
+        const posicionHombreLobo = randomizador.posicion()
+        return new Enemigo(
+            vida = vidaHombreLobo,
+            danio = danioHombreLobo,
+            imagen = "hombre_lobo.png",
+            posicion = posicionHombreLobo)
+    }
+    method diablillo(){
+        const vidaDiablillo = randomizador.estadistica(50, 5)
+        const danioDiablillo = randomizador.estadistica(10, 3)
+        const posicionDiablillo = randomizador.posicion()
+        return new Enemigo(
+            vida = vidaDiablillo,
+            danio = danioDiablillo,
+            imagen = "diablillo.png",
+            posicion = posicionDiablillo)
+    }
+    method vampiro(){
+        const vidaVampiro = randomizador.estadistica(200, 25)
+        const danioVampiro = randomizador.estadistica(20, 15)
+        const posicionVampiro = randomizador.posicion()
+        return new Enemigo(
+            vida = vidaVampiro,
+            danio = danioVampiro,
+            imagen = "vampiro.png",
+            posicion = posicionVampiro)
+    }
+    method diablo(){
+        const vidaDiablo = randomizador.estadistica(500, 0)
+        const danioDiablo = randomizador.estadistica(80, 10)
+        const posicionDiablo = randomizador.posicion()
+        return new Enemigo(
+            vida = vidaDiablo,
+            danio = danioDiablo,
+            imagen = "diablo.png",
+            posicion = posicionDiablo)
+    }
+    method aleatorio(enemigos){
+        const seed = 1.randomUpTo(4).floor()
+        var enemigo
+        if(seed % 4 == 0)
+            enemigo = self.hombreLobo()
+        if(seed % 4 == 1)
+            enemigo = self.diablillo()
+        if(seed % 4 == 2)
+            enemigo = self.vampiro()
+        if(seed % 4 == 3)
+            enemigo = self.diablo()
+        enemigos.add(enemigo)
+        game.addVisual(enemigo)
+    }
+}
 
-        posicionesPosibles.forEach { 
-            unaPosicion => 
-            if(unaPosicion.distance(brujo.position()) < menorDistancia){
-                mejorPosicion = unaPosicion
-                menorDistancia = unaPosicion.distance(brujo.position())
-            }
+object randomizador{
+    method estadistica(estadisticaBase, variacion){
+        var estadisticaReal = estadisticaBase
+        if(1.randomUpTo(2).odd())
+            estadisticaReal = (estadisticaReal - variacion).max(1)
+        return estadisticaReal.randomUpTo(variacion)
+    }
+    method posicion(){
+        const posicionX = 0.randomUpTo(game.width() - 1).floor()
+        const posicionY = 0.randomUpTo(game.height() - 1).floor()
+        const posicionGenerada = new Position(x = posicionX , y = posicionY)
+        game.allVisuals().forEach{ 
+            cosa => 
+            if(game.onSameCell(cosa.position(), posicionGenerada)) 
+                posicionGenerada.up(3)
         }
-        posicion = mejorPosicion
+        return posicionGenerada
+    }
+    method mejorar(maximo){
+        return 1.randomUpTo(maximo).floor()
     }
 }

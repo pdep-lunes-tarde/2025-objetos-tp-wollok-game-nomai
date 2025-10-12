@@ -1,21 +1,31 @@
 # Brujos y Diablos
 
-juego "rpg" con personajes (magos) que disparan proyectiles
+Juego "rpg" con personajes (magos) que disparan proyectiles a enemigos que van generandose con el tiempo jugado
 
-- TODO:
-  - [ ] victoria
-    - al llegar a cierta cantidad de enemigos eliminados
-  - [ ] generacion de enemigos constante
-  - [ ] que al morir un enemigo tambien muera el disparo (error!)
-
-- [ ] enemigos que van directo al jugador
-  - [ ] diferencia entre enemigos: vida, daño, velocidad
-  - [ ] hombre-lobos (comun)
+## TODO List
+- Funcionalidades principales que necesitamos para la 1° entrega:
+  - [ ] Funcionalidad para poder conseguir la Victoria
+    - Al llegar a cierta cantidad de enemigos eliminados
+    - [ ] Mejorar esta pantalla
+  - [ ] Derrota
+    - [ ] Mejorar esta pantalla
+  - [x] Generacion de enemigos constante
+  - [ ] Que al morir un enemigo:
+    - [x] muera el disparo que lo mato
+    - [ ] mueran/cambien de objetivo todos los disparo que le apuntaban
+#### Funcionalidades principales no priorizadas
+- [ ] Enemigos que van directo al jugador
+  - [x] generables
+  - [ ] diferencia entre enemigos: 
+    - [x] vida
+    - [x] daño
+    - [ ] velocidad
+  - [x] hombre-lobos (comun)
   - [x] diablillos (poco comun)
-  - [ ] vampiros (mini-jefe)
+  - [x] vampiros (mini-jefe)
   - [x] diablos (jefe)
-  
-- [ ] distintas armas
+###
+- [ ] Distintas armas
   - [ ] rueda de armas para cambiar entre cada una con teclas 
   - [ ] uno que dispare al mas cercano
   - [ ] uno que dispare al que menos vida tenga 
@@ -24,16 +34,15 @@ juego "rpg" con personajes (magos) que disparan proyectiles
     - [ ] daño explosivo
   - [ ] uno que dispare a un enemigo aleatorio 
     - [ ] dispara mas rapido
-  
-- [ ] niveles
-  
-- [ ] mejoras (modificaciones de ataque)
+###
+- [ ] Niveles que proporcionen mejoras (modificaciones de ataque)
+  - [ ] mas daño
+  - [ ] mas velocidad de ataque
   - [ ] daño explosivo
   - [ ] penetracion
-  - [ ] velocidad de ataque
-  - [ ] mas daño
 
-- [ ] menú
-  - [ ] dificultad (cambia la velocidad base de los enemigos y los proyectiles)
+- [ ] Menú para elegir diferentes opciones
+  - [ ] Armas elegidas
+  - [ ] Dificultad (cambia la velocidad de los enemigos y los proyectiles)
 
 - ??
