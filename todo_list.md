@@ -4,15 +4,15 @@ Juego "rpg" con personajes (magos) que disparan proyectiles a enemigos que van g
 
 ## TODO List
 - Funcionalidades principales que necesitamos para la 1° entrega:
-  - [ ] Funcionalidad para poder conseguir la Victoria
+  - [x] Funcionalidad para poder conseguir la Victoria
     - Al llegar a cierta cantidad de enemigos eliminados
     - [ ] Mejorar esta pantalla
-  - [ ] Derrota
+  - [x] Derrota
     - [ ] Mejorar esta pantalla
   - [x] Generacion de enemigos constante
-  - [ ] Que al morir un enemigo:
+  - [x] Que al morir un enemigo:
     - [x] muera el disparo que lo mato
-    - [ ] mueran/cambien de objetivo todos los disparo que le apuntaban
+    - [x] mueran/cambien de objetivo todos los disparo que le apuntaban
 #### Funcionalidades principales no priorizadas
 - [ ] Enemigos que van directo al jugador
   - [x] generables
@@ -43,6 +43,9 @@ Juego "rpg" con personajes (magos) que disparan proyectiles a enemigos que van g
 
 - [ ] Menú para elegir diferentes opciones
   - [ ] Armas elegidas
-  - [ ] Dificultad (cambia la velocidad de los enemigos y los proyectiles)
+  - [ ] Dificultad, cambia:
+    - [ ] la velocidad de los enemigos 
+    - [ ] los proyectiles
+    - [ ] la cantidad de enemigos
 
 - ??

@@ -6,7 +6,7 @@ class Brujo{
     var direccionImagen = derecha
 
     var vida = 100
-    var enemigos_eliminados = 0
+    var enemigosEliminados = 0
     var danio_realizado = 0
     var proyectiles = []
     // const magia
@@ -61,8 +61,20 @@ class Brujo{
         danio_realizado += danio
     }
 
+    method enemigosEliminados() = enemigosEliminados
+    method aumentarEnemigosEliminados(enemigo){
+        if(! enemigo.estaVivo())
+            enemigosEliminados += 1
+        if(enemigosEliminados >= 10)
+            brujosYdiablos.ganar()
+    }
+
     method proyectiles() = proyectiles
-    method removerDisparo(disparo) = proyectiles.remove(disparo)
+    method removerDisparo(disparo) { 
+        disparo.matar()
+        proyectiles.remove(disparo)
+        game.removeVisual(disparo)
+    }
 }
 
 // magias
@@ -80,15 +92,17 @@ class DisparoCercano {
     method objetivo() = enemigo_fijado
     method danio_inflijido() = danio_inflijido
     method estaVivo() = estaVivo
+    method matar() {
+        estaVivo = false
+    }
 
     method golpeasteAEnemigo(enemigo, enemigos, brujo){
         if(enemigo != self.objetivo())
             return null
         enemigo.restarVida(self.danio_inflijido(), enemigos)
-        estaVivo = false
-        game.removeVisual(self)
-        brujo.removerDisparo(self)
         brujo.aumentarDanioRealizado(self.danio_inflijido())
+        brujo.aumentarEnemigosEliminados(enemigo)
+        brujo.removerDisparo(self)
         return null
     }
     method golpeasteABrujo(_brujo) {}
@@ -100,31 +114,7 @@ class DisparoCercano {
             self.golpeasteAEnemigo(objetivo, enemigos, brujo)
             }
         )
+        if(! enemigo_fijado.estaVivo())
+            brujo.removerDisparo(self)
     }
 }
-
-// mejoras
-// class Danio_explosivo {
-//     var area
-//     method mejorar(maximo) {
-//         area += randomizador.mejorar(maximo * 1)
-//     }
-// }
-// class Penetracion {
-//     var penetraciones
-//     method mejorar(maximo) {
-//         penetraciones += randomizador.mejorar(maximo * 1)
-//     }
-// }
-// class VelocidadDeAtaque{
-//     var velocidad
-//     method mejorar(maximo) {
-//         velocidad += randomizador.mejorar(maximo * 5)
-//     }
-// }
-// class Danio {
-//     var danio_aumentado
-//     method mejorar(maximo) {
-//         danio_aumentado += randomizador.mejorar(maximo * 2)
-//     }
-// }
