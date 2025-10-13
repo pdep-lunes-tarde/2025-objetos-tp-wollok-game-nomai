@@ -29,8 +29,8 @@ object brujosYdiablos {
     method ancho() = 16
 
     var enemigos = [
-        new Enemigo(posicion = new Position(x=12,y=12), vida = 30, imagen = "diablillo.png"),
-        new Enemigo(posicion = new Position(x=8,y=13), vida = 50, imagen = "diablillo.png")
+        generarEnemigos.diablillo(),
+        generarEnemigos.diablillo()
     ]
     var paredes = []
 
@@ -67,8 +67,8 @@ object brujosYdiablos {
         game.onCollideDo(brujo, { cosa => cosa.golpeasteABrujo(brujo) })
         game.onTick(500, "movimiento_enemigos", { enemigos.forEach { enemigo => enemigo.moverHacia(brujo) } })
         game.onTick(200, "movimiento_proyectiles", { brujo.proyectiles().forEach { proyectil => proyectil.moverHacia(enemigos, brujo) } } )
-        game.onTick(1000, "disparo", { brujo.disparar(enemigos) })
-        game.onTick(10000, "generacion_enemigos", { generarEnemigos.aleatorio(enemigos) })
+        game.onTick(1500, "disparo", { brujo.disparar(enemigos) })
+        game.onTick(3000, "generacion_enemigos", { generarEnemigos.aleatorio(enemigos) })
     }
 
     method finalizar(){

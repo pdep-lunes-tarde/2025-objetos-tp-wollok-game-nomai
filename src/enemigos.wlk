@@ -91,7 +91,7 @@ object generarEnemigos {
             posicion = posicionDiablo)
     }
     method aleatorio(enemigos){
-        const seed = 1.randomUpTo(4).floor()
+        const seed = 1.randomUpTo(10).floor()
         var enemigo
         if(seed % 4 == 0)
             enemigo = self.hombreLobo()
@@ -107,7 +107,13 @@ object generarEnemigos {
 }
 
 object randomizador{
+    var isTesting = false
+    method habilitarTesteo() {
+        isTesting = true
+    }
     method estadistica(estadisticaBase, variacion){
+        if(isTesting)
+            return estadisticaBase
         var estadisticaReal = estadisticaBase
         if(1.randomUpTo(2).odd())
             estadisticaReal = (estadisticaReal - variacion).max(1)

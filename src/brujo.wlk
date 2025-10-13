@@ -33,6 +33,8 @@ class Brujo{
         return new Position(x=nuevaX, y=nuevaY)
     }
 
+    method vida() = vida
+    method vida(nuevaVida) = nuevaVida
     method perderVida(danioRecibido){
         if(vida - danioRecibido > 0)
             vida = vida - danioRecibido
