@@ -1,14 +1,13 @@
 import tp.*
 import movimiento.*
 
-class Brujo{
-    var posicion
+object brujo{
+    var posicion = game.center()
     var direccionImagen = derecha
 
     var vida = 100
     var enemigosEliminados = 0
     var danio_realizado = 0
-    var proyectiles = []
     // const magia
     // const mejoras = []
 
@@ -21,17 +20,12 @@ class Brujo{
     method mover(direccion) {
         if(direccion.horizontal())
             direccionImagen = direccion
-        const nuevaPosicion = direccion.siguientePosicion(posicion)
-
-        posicion = self.posicionCorregida(nuevaPosicion)
+        const posicionEsperada = direccion.siguientePosicion(posicion)
+        if(self.esMovimientoValido(posicionEsperada))
+            posicion = posicionEsperada
     }
 
-    method posicionCorregida(posicionACorregir) {
-        const nuevaX = movimiento.limitar(posicionACorregir.x(), 0, brujosYdiablos.ancho())
-        const nuevaY = movimiento.limitar(posicionACorregir.y(), 0, brujosYdiablos.alto())
-
-        return new Position(x=nuevaX, y=nuevaY)
-    }
+    method esMovimientoValido(unaPosicion) = movimiento.estaEnPantalla(unaPosicion)
 
     method vida() = vida
     method vida(nuevaVida) = nuevaVida
@@ -46,17 +40,17 @@ class Brujo{
     method disparar(enemigos){
         if(enemigos.size() == 0)
             return null
-        var enemigo_mas_cercano = enemigos.get(0)
-        enemigos.forEach {
-            unEnemigo =>
-            if(unEnemigo.position().distance(self.position()) < enemigo_mas_cercano.position().distance(self.position())){
-                enemigo_mas_cercano = unEnemigo
-            }
+        const enemigo_mas_cercano = enemigos.min {
+            unEnemigo => unEnemigo.position().distance(self.position())
         }
         const disparo = new DisparoCercano ( posicion = self.position() , enemigo_fijado = enemigo_mas_cercano )
-        proyectiles.add(disparo)
+        game.onCollideDo(disparo, {
+            objetivo => 
+            disparo.golpeasteAEnemigo(objetivo, enemigos, self)
+            }
+        )
         game.addVisual(disparo)
-        return null
+        return disparo
     }
 
     method aumentarDanioRealizado(danio){
@@ -67,15 +61,16 @@ class Brujo{
     method aumentarEnemigosEliminados(enemigo){
         if(! enemigo.estaVivo())
             enemigosEliminados += 1
-        if(enemigosEliminados >= 10)
+        if(enemigosEliminados >= brujosYdiablos.scoreParaGanar())
             brujosYdiablos.ganar()
     }
 
-    method proyectiles() = proyectiles
-    method removerDisparo(disparo) { 
-        disparo.matar()
-        proyectiles.remove(disparo)
-        game.removeVisual(disparo)
+    method reiniciar(){
+        vida = 100
+        enemigosEliminados = 0
+        danio_realizado = 0
+        posicion = game.center()
+        direccionImagen = derecha
     }
 }
 
@@ -96,6 +91,7 @@ class DisparoCercano {
     method estaVivo() = estaVivo
     method matar() {
         estaVivo = false
+        game.removeVisual(self)
     }
 
     method golpeasteAEnemigo(enemigo, enemigos, brujo){
@@ -104,19 +100,14 @@ class DisparoCercano {
         enemigo.restarVida(self.danio_inflijido(), enemigos)
         brujo.aumentarDanioRealizado(self.danio_inflijido())
         brujo.aumentarEnemigosEliminados(enemigo)
-        brujo.removerDisparo(self)
+        self.matar()
         return null
     }
     method golpeasteABrujo(_brujo) {}
 
     method moverHacia(enemigos, brujo){
         movimiento.moverHacia(self, enemigo_fijado)
-        game.onCollideDo(self, {
-            objetivo => 
-            self.golpeasteAEnemigo(objetivo, enemigos, brujo)
-            }
-        )
         if(! enemigo_fijado.estaVivo())
-            brujo.removerDisparo(self)
+            self.matar()
     }
 }

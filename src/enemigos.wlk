@@ -1,6 +1,7 @@
 import src.brujo.*
 import movimiento.*
 import wollok.game.*
+import tp.*
 // Tipos de Enemigos:
 // hombre lobo:
 // - rareza = comun ; vida = 15 ; daño = 5 ; velocidad = 6
@@ -13,23 +14,26 @@ import wollok.game.*
 
 
 class Enemigo{
-    var vida = 500
-    const danio = 80
-    var imagen = "diablo.png"
+    var vida
+    const danio
+    var imagen
     var posicion
-    var estaVivo = true
+
+    method text() = vida.toString()
+    method textColor() = color.verde()
     method vida() = vida
     method restarVida(danioRecibido, enemigos){ 
-        if(! estaVivo)
+        if(! self.estaVivo())
             return null
-        if(vida > danioRecibido)
-            vida -= danioRecibido
-        else
+        if(vida < danioRecibido){
             self.morir(enemigos)
+        } else {
+            vida -= danioRecibido
+        }
         return null
     }
     method morir(enemigos){
-        estaVivo = false
+        vida = 0
         imagen = "muerte.png"
         game.schedule(500, { => game.removeVisual(self) })
         game.schedule(501, { => enemigos.remove(self) })
@@ -40,7 +44,7 @@ class Enemigo{
     method position(nuevaPosicion){ 
         posicion = nuevaPosicion 
     }
-    method estaVivo() = estaVivo
+    method estaVivo() = vida > 0
     method golpeasteABrujo(brujo){
         brujo.perderVida(self.danio())
     }
@@ -51,8 +55,8 @@ class Enemigo{
 
 object generarEnemigos {
     method hombreLobo(){
-        const vidaHombreLobo = randomizador.estadistica(15, 5)
-        const danioHombreLobo = randomizador.estadistica(5, 2)
+        const vidaHombreLobo = randomizador.generarEstadistica(15, 5)
+        const danioHombreLobo = randomizador.generarEstadistica(5, 2)
         const posicionHombreLobo = randomizador.posicion()
         return new Enemigo(
             vida = vidaHombreLobo,
@@ -61,8 +65,8 @@ object generarEnemigos {
             posicion = posicionHombreLobo)
     }
     method diablillo(){
-        const vidaDiablillo = randomizador.estadistica(50, 5)
-        const danioDiablillo = randomizador.estadistica(10, 3)
+        const vidaDiablillo = randomizador.generarEstadistica(50, 5)
+        const danioDiablillo = randomizador.generarEstadistica(10, 3)
         const posicionDiablillo = randomizador.posicion()
         return new Enemigo(
             vida = vidaDiablillo,
@@ -71,8 +75,8 @@ object generarEnemigos {
             posicion = posicionDiablillo)
     }
     method vampiro(){
-        const vidaVampiro = randomizador.estadistica(200, 25)
-        const danioVampiro = randomizador.estadistica(20, 15)
+        const vidaVampiro = randomizador.generarEstadistica(200, 25)
+        const danioVampiro = randomizador.generarEstadistica(20, 15)
         const posicionVampiro = randomizador.posicion()
         return new Enemigo(
             vida = vidaVampiro,
@@ -81,8 +85,8 @@ object generarEnemigos {
             posicion = posicionVampiro)
     }
     method diablo(){
-        const vidaDiablo = randomizador.estadistica(500, 0)
-        const danioDiablo = randomizador.estadistica(80, 10)
+        const vidaDiablo = randomizador.generarEstadistica(500, 0)
+        const danioDiablo = randomizador.generarEstadistica(80, 10)
         const posicionDiablo = randomizador.posicion()
         return new Enemigo(
             vida = vidaDiablo,
@@ -111,23 +115,22 @@ object randomizador{
     method habilitarTesteo() {
         isTesting = true
     }
-    method estadistica(estadisticaBase, variacion){
-        if(isTesting)
+    method generarEstadistica(estadisticaBase, variacion){
+        if(isTesting or variacion > estadisticaBase)
             return estadisticaBase
-        var estadisticaReal = estadisticaBase
-        if(1.randomUpTo(2).odd())
-            estadisticaReal = (estadisticaReal - variacion).max(1)
-        return estadisticaReal.randomUpTo(variacion)
+        return (estadisticaBase - variacion).randomUpTo(estadisticaBase + variacion).floor()
     }
     method posicion(){
+        
         const posicionX = 0.randomUpTo(game.width() - 1).floor()
         const posicionY = 0.randomUpTo(game.height() - 1).floor()
         const posicionGenerada = new Position(x = posicionX , y = posicionY)
-        game.allVisuals().forEach{ 
-            cosa => 
-            if(game.onSameCell(cosa.position(), posicionGenerada)) 
-                posicionGenerada.up(3)
-        }
+        game.getObjectsIn(posicionGenerada)
+        // game.allVisuals().forEach{ 
+        //     cosa =>
+        //     if(game.onSameCell(cosa.position(), posicionGenerada)) 
+        //         posicionGenerada = posicionGenerada.up(3)
+        // }
         return posicionGenerada
     }
     method mejorar(maximo){

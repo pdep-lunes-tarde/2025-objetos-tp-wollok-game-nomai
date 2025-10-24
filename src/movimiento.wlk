@@ -1,11 +1,10 @@
+import src.tp.*
 object movimiento{
     method movimiento(objetoAMoverse, direccion) = direccion.siguientePosicion(objetoAMoverse.position())
-    method limitar(numero, limiteInferior, limiteSuperior) {
-        if(numero <= limiteInferior)
-            return limiteInferior
-        if(numero >= limiteSuperior)
-            return limiteSuperior - 1
-        return numero
+    method estaEnPantalla(posicion) {
+        return 
+            (posicion.x() >= 0 and posicion.y() >= 0) and 
+            (posicion.x() < brujosYdiablos.ancho() and posicion.y() < brujosYdiablos.alto())
     }
     method moverHacia(objetoAMoverse, objetivo){
         if(! objetoAMoverse.estaVivo())
@@ -13,27 +12,15 @@ object movimiento{
         const direccionesPosibles = [arriba,abajo,izquierda,derecha]
         // hace un map para conseguir todas las posiciones a las que se puede mover el enemigo
         const posicionesPosibles = direccionesPosibles.map{ unaDireccion => self.movimiento(objetoAMoverse,unaDireccion) }
-        // "contador" para conseguir la mejor posicion a la que se puede mover
-        var mejorPosicion = posicionesPosibles.get(0)
-        // "contador" para conseguir la menor distancia entre la posible posicion del enemigo y el brujo
-        var menorDistancia = mejorPosicion.distance(objetivo.position())
-
-        // itera por todas las posiciones para conseguir la mejor
-
-        posicionesPosibles.forEach { 
-            unaPosicion => 
-            if(unaPosicion.distance(objetivo.position()) < menorDistancia){
-                mejorPosicion = unaPosicion
-                menorDistancia = unaPosicion.distance(objetivo.position())
-            }
-        }
+        // consigue la posicion que menor distancia tiene hacia el objetivo
+        const mejorPosicion = posicionesPosibles.min { unaPosicion => unaPosicion.distance(objetivo.position()) }
         objetoAMoverse.position(mejorPosicion)
         return null
     }
-    // method moverHacia()
 }
 
 
+// direcciones
 object izquierda {
     method horizontal() = true
     method siguientePosicion(posicion) {

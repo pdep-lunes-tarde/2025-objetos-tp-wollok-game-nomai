@@ -1,4 +1,5 @@
 import src.enemigos.*
+import src.brujo.*
 import tp.*
 import movimiento.*
 
@@ -42,8 +43,7 @@ describe "Movimiento"{
 
 		const posicionBrujo = new Position(x=10, y=10)
 		brujo.position(posicionBrujo)
-		brujo.disparar(enemigos)
-		const proyectil = brujo.proyectiles().get(0)
+		const proyectil = brujo.disparar(enemigos)
 
 		const posicionEsperada = new Position(x=9, y=10)
 		proyectil.moverHacia(enemigos, brujo)
@@ -55,8 +55,7 @@ describe "Movimiento"{
 		const enemigo = generarEnemigos.diablo()
 		const enemigos = [enemigo]
 
-		brujo.disparar(enemigos)
-		const proyectil = brujo.proyectiles().get(0)
+		const proyectil = brujo.disparar(enemigos)
 
 		enemigo.morir(enemigos)
 		proyectil.moverHacia(enemigos, brujo)
@@ -79,8 +78,7 @@ describe "Colisiones"{
 		const enemigo = generarEnemigos.diablo()
 		const enemigos = [enemigo]
 
-		brujo.disparar(enemigos)
-		const proyectil = brujo.proyectiles().get(0)
+		const proyectil = brujo.disparar(enemigos)
 
 		proyectil.golpeasteAEnemigo(enemigo, enemigos, brujo)
 
@@ -91,8 +89,7 @@ describe "Colisiones"{
 		const enemigo = generarEnemigos.hombreLobo()
 		const enemigos = [enemigo]
 
-		brujo.disparar(enemigos)
-		const proyectil = brujo.proyectiles().get(0)
+		const proyectil = brujo.disparar(enemigos)
 
 		proyectil.golpeasteAEnemigo(enemigo, enemigos, brujo)
 
@@ -103,8 +100,7 @@ describe "Colisiones"{
 		const enemigo = generarEnemigos.diablo()
 		const enemigos = [enemigo]
 
-		brujo.disparar(enemigos)
-		const proyectil = brujo.proyectiles().get(0)
+		const proyectil = brujo.disparar(enemigos)
 
 		proyectil.golpeasteAEnemigo(enemigo, enemigos, brujo)
 

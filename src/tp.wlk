@@ -5,49 +5,52 @@ import src.enemigos.*
 import movimiento.*
 
 object color {
+    const property blanco =  "FFFFFFFF"
     const property verde = "00FF00FF"
-    const property rojo = "FF0000FF"
+    const property rojo =  "FF8888FF"
 }
 
-object texto_victoria{
-    const posicion = new Position(x = brujosYdiablos.ancho() / 2, y = 4)
-    method text() = "Ganaste! Derrotaste a " + brujo.enemigosEliminados() + " enemigos"
-    method textColor() = color.verde()
-    method position() = posicion
-}
-object texto_derrota{
-    const posicion = new Position(x = brujosYdiablos.ancho() / 2, y = 4)
-    method text() = "Perdiste"
-    method textColor() = color.rojo()
+object textoFinal{
+    const posicion = new Position(x = brujosYdiablos.ancho() / 2, y = brujosYdiablos.alto() - 4)
+    var texto = ""
+    var colorTexto = color.verde()
+    method victoria(){
+        texto = "Ganaste! Derrotaste a " + brujo.enemigosEliminados() + " enemigos"
+        colorTexto = color.verde()
+    }
+    method derrota(){
+        texto = "Perdiste"
+        colorTexto = color.rojo()
+    }
+    method text() = texto
+    method textColor() = colorTexto
     method position() = posicion
 }
 
-const brujo = new Brujo(posicion = game.center())
+object textoVolverAJugar{
+    const posicion = new Position(x = brujosYdiablos.ancho() / 2, y = 4)
+    method text() = "Para volver a jugar presiona la tecla 'Espacio'!"
+    method textColor() = color.blanco()
+    method position() = posicion
+}
 
 object brujosYdiablos {
     method alto() = 16
     method ancho() = 16
+    method scoreParaGanar() = 2
 
-    var enemigos = [
-        generarEnemigos.diablillo(),
-        generarEnemigos.diablillo()
-    ]
-    var paredes = []
+    const proyectiles = []
+    const enemigos = []
+    const paredes = []
 
     method configurar(){
-        game.width(self.alto())
-        game.height(self.ancho())
-        game.cellSize(32)
         game.ground("pasto.png")
 
-        
-        // new Range(start = 0, end = 15).forEach { n => 
-		// 	paredes.add(new Pared(posicion = new Position(x=n,y=0)))
-        // }
-
+        enemigos.add(generarEnemigos.diablillo())
+        enemigos.add(generarEnemigos.diablillo())
+        game.addVisual(brujo)
         enemigos.forEach { enemigo => game.addVisual(enemigo) }
         // paredes.forEach { pared => game.addVisual(pared) }
-        game.addVisual(brujo)
 
         
         
@@ -66,34 +69,42 @@ object brujosYdiablos {
 
         game.onCollideDo(brujo, { cosa => cosa.golpeasteABrujo(brujo) })
         game.onTick(500, "movimiento_enemigos", { enemigos.forEach { enemigo => enemigo.moverHacia(brujo) } })
-        game.onTick(200, "movimiento_proyectiles", { brujo.proyectiles().forEach { proyectil => proyectil.moverHacia(enemigos, brujo) } } )
-        game.onTick(1500, "disparo", { brujo.disparar(enemigos) })
+        game.onTick(200, "movimiento_proyectiles", { proyectiles.forEach { proyectil => proyectil.moverHacia(enemigos, brujo) } } )
+        game.onTick(1500, "disparo", { proyectiles.add(brujo.disparar(enemigos)) })
         game.onTick(3000, "generacion_enemigos", { generarEnemigos.aleatorio(enemigos) })
     }
 
-    method finalizar(){
+    method finalizar(resultado){
         brujo.position(game.center())
-        game.allVisuals().forEach { cosa => game.removeVisual(cosa) }
-        enemigos = []
-        paredes = []
-        game.removeTickEvent("generacion_enemigos")
-        game.removeTickEvent("movimiento_enemigos")
-        game.removeTickEvent("disparo")
-        game.removeTickEvent("movimiento_proyectiles")
+        game.clear()
+        enemigos.clear()
+        paredes.clear()
         game.addVisual(brujo)
+        resultado.apply(textoFinal)
+        game.addVisual(textoFinal)
+        game.addVisual(textoVolverAJugar)
+        keyboard.space().onPressDo({ self.reiniciar() })
     }
     method perder(){
         game.ground("fondo_perder.png")
-        self.finalizar()
-        game.addVisual(texto_derrota)
+        self.finalizar({t => t.derrota()})
     }
 
     method ganar(){
-        self.finalizar()
-        game.addVisual(texto_victoria)
+        self.finalizar({t => t.victoria()})
+    }
+
+    method reiniciar(){
+        game.clear()
+        brujo.reiniciar()
+        self.configurar()
     }
 
     method iniciar(){
+        game.width(self.alto())
+        game.height(self.ancho())
+        game.cellSize(32)
+
         self.configurar()
 
         game.start()
