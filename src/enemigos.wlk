@@ -17,7 +17,7 @@ class Enemigo{
     var vida
     const danio
     var imagen
-    var posicion
+    var posicion = new Position(x=0,y=0)
 
     method text() = vida.toString()
     method textColor() = color.verde()
@@ -38,6 +38,11 @@ class Enemigo{
         game.schedule(500, { => game.removeVisual(self) })
         game.schedule(501, { => enemigos.remove(self) })
     }
+    method añadirAlJuego(){
+        posicion = randomizador.generarPosicion()
+        game.addVisual(self)
+        return self
+    }
     method danio() = danio
     method image() = imagen
     method position() = posicion
@@ -53,48 +58,37 @@ class Enemigo{
     }
 }
 
-object generarEnemigos {
+class HombreLobo inherits Enemigo(
+    vida = randomizador.generarEstadistica(15, 5), 
+    danio = randomizador.generarEstadistica(5, 2),
+    imagen = "hombre_lobo.png"){}
+class Diablillo inherits Enemigo(
+    vida = randomizador.generarEstadistica(50, 5), 
+    danio = randomizador.generarEstadistica(10, 3),
+    imagen = "diablillo.png"){}
+class Vampiro inherits Enemigo(
+    vida = randomizador.generarEstadistica(200, 25), 
+    danio = randomizador.generarEstadistica(20, 15),
+    imagen = "vampiro.png"){}
+class Diablo inherits Enemigo(
+    vida = randomizador.generarEstadistica(500, 0), 
+    danio = randomizador.generarEstadistica(80, 10),
+    imagen = "diablo.png"){}
+
+object generarEnemigo {
     method hombreLobo(){
-        const vidaHombreLobo = randomizador.generarEstadistica(15, 5)
-        const danioHombreLobo = randomizador.generarEstadistica(5, 2)
-        const posicionHombreLobo = randomizador.posicion()
-        return new Enemigo(
-            vida = vidaHombreLobo,
-            danio = danioHombreLobo,
-            imagen = "hombre_lobo.png",
-            posicion = posicionHombreLobo)
+        return new HombreLobo().añadirAlJuego()
     }
     method diablillo(){
-        const vidaDiablillo = randomizador.generarEstadistica(50, 5)
-        const danioDiablillo = randomizador.generarEstadistica(10, 3)
-        const posicionDiablillo = randomizador.posicion()
-        return new Enemigo(
-            vida = vidaDiablillo,
-            danio = danioDiablillo,
-            imagen = "diablillo.png",
-            posicion = posicionDiablillo)
+        return new Diablillo().añadirAlJuego()
     }
     method vampiro(){
-        const vidaVampiro = randomizador.generarEstadistica(200, 25)
-        const danioVampiro = randomizador.generarEstadistica(20, 15)
-        const posicionVampiro = randomizador.posicion()
-        return new Enemigo(
-            vida = vidaVampiro,
-            danio = danioVampiro,
-            imagen = "vampiro.png",
-            posicion = posicionVampiro)
+        return new Vampiro().añadirAlJuego()
     }
     method diablo(){
-        const vidaDiablo = randomizador.generarEstadistica(500, 0)
-        const danioDiablo = randomizador.generarEstadistica(80, 10)
-        const posicionDiablo = randomizador.posicion()
-        return new Enemigo(
-            vida = vidaDiablo,
-            danio = danioDiablo,
-            imagen = "diablo.png",
-            posicion = posicionDiablo)
+        return new Diablo().añadirAlJuego()
     }
-    method aleatorio(enemigos){
+    method enemigo_aleatorio(){
         const seed = 1.randomUpTo(10).floor()
         var enemigo
         if(seed % 4 == 0)
@@ -105,8 +99,15 @@ object generarEnemigos {
             enemigo = self.vampiro()
         if(seed % 4 == 3)
             enemigo = self.diablo()
-        enemigos.add(enemigo)
-        game.addVisual(enemigo)
+        return enemigo
+        
+        // const enemigosAElegir = [
+        //     {self.hombreLobo()},
+        //     {self.diablillo()},
+        //     {self.vampiro()},
+        //     {self.diablo()}]
+        // const enemigo = enemigosAElegir.apply()
+        // return enemigo
     }
 }
 
@@ -115,25 +116,22 @@ object randomizador{
     method habilitarTesteo() {
         isTesting = true
     }
+    method deshabilitarTesteo() {
+        isTesting = false
+    }
     method generarEstadistica(estadisticaBase, variacion){
         if(isTesting or variacion > estadisticaBase)
             return estadisticaBase
         return (estadisticaBase - variacion).randomUpTo(estadisticaBase + variacion).floor()
     }
-    method posicion(){
-        
+    method generarPosicion(){
         const posicionX = 0.randomUpTo(game.width() - 1).floor()
         const posicionY = 0.randomUpTo(game.height() - 1).floor()
-        const posicionGenerada = new Position(x = posicionX , y = posicionY)
-        game.getObjectsIn(posicionGenerada)
-        // game.allVisuals().forEach{ 
-        //     cosa =>
-        //     if(game.onSameCell(cosa.position(), posicionGenerada)) 
-        //         posicionGenerada = posicionGenerada.up(3)
-        // }
+        var posicionGenerada = new Position(x = posicionX , y = posicionY)
+
+        if((!isTesting) and (game.getObjectsIn(posicionGenerada).size() > 0 or brujo.position().distance(posicionGenerada) < 4)){
+            posicionGenerada = self.generarPosicion()
+        }
         return posicionGenerada
-    }
-    method mejorar(maximo){
-        return 1.randomUpTo(maximo).floor()
     }
 }

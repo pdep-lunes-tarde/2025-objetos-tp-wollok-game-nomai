@@ -37,7 +37,7 @@ object textoVolverAJugar{
 object brujosYdiablos {
     method alto() = 16
     method ancho() = 16
-    method scoreParaGanar() = 2
+    method scoreParaGanar() = 10
 
     const proyectiles = []
     const enemigos = []
@@ -46,10 +46,9 @@ object brujosYdiablos {
     method configurar(){
         game.ground("pasto.png")
 
-        enemigos.add(generarEnemigos.diablillo())
-        enemigos.add(generarEnemigos.diablillo())
+        enemigos.add(generarEnemigo.diablillo())
+        enemigos.add(generarEnemigo.diablillo())
         game.addVisual(brujo)
-        enemigos.forEach { enemigo => game.addVisual(enemigo) }
         // paredes.forEach { pared => game.addVisual(pared) }
 
         
@@ -71,7 +70,7 @@ object brujosYdiablos {
         game.onTick(500, "movimiento_enemigos", { enemigos.forEach { enemigo => enemigo.moverHacia(brujo) } })
         game.onTick(200, "movimiento_proyectiles", { proyectiles.forEach { proyectil => proyectil.moverHacia(enemigos, brujo) } } )
         game.onTick(1500, "disparo", { proyectiles.add(brujo.disparar(enemigos)) })
-        game.onTick(3000, "generacion_enemigos", { generarEnemigos.aleatorio(enemigos) })
+        game.onTick(3000, "generacion_enemigos", { enemigos.add(generarEnemigo.enemigo_aleatorio()) })
     }
 
     method finalizar(resultado){
