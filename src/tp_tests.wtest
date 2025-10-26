@@ -62,7 +62,7 @@ describe "Movimiento"{
 
 		const proyectil = brujo.disparar(enemigos)
 
-		enemigo.morir(enemigos)
+		enemigo.morir()
 		proyectil.moverHacia(enemigos, brujo)
 
 		assert.equals(false, proyectil.estaVivo())
@@ -86,19 +86,19 @@ describe "Colisiones"{
 
 		const proyectil = brujo.disparar(enemigos)
 
-		proyectil.golpeasteAEnemigo(enemigo, enemigos, brujo)
+		proyectil.golpeasteAEnemigo(enemigo, brujo)
 
 		assert.equals(480, enemigo.vida())
 	}
-	test "Al chocar un proyectil con su enemigo fijado, si el enemigo tiene menos vida que el daño que realiza el proyectil, éste muere" {
+	test "Al chocar un proyectil con su enemigo fijado, si el enemigo tiene menos o la misma vida que el daño que realiza el proyectil, éste muere" {
 		
 		randomizador.habilitarTesteo()
-		const enemigo = generarEnemigo.hombreLobo()
+		const enemigo = generarEnemigo.diablillo() 
 		const enemigos = [enemigo]
 
 		const proyectil = brujo.disparar(enemigos)
 
-		proyectil.golpeasteAEnemigo(enemigo, enemigos, brujo)
+		proyectil.golpeasteAEnemigo(enemigo, brujo)
 
 		assert.equals(false, enemigo.estaVivo())
 	}
@@ -110,7 +110,7 @@ describe "Colisiones"{
 
 		const proyectil = brujo.disparar(enemigos)
 
-		proyectil.golpeasteAEnemigo(enemigo, enemigos, brujo)
+		proyectil.golpeasteAEnemigo(enemigo, brujo)
 
 		assert.equals(false, proyectil.estaVivo())
 	}
@@ -119,37 +119,41 @@ describe "Colisiones"{
 /* 
 Tipos de Enemigos:
 	hombre lobo:
-		- rareza = comun ; vida = 15 ; daño = 5 ; velocidad = 6
+		- rareza = comun ; vida = 30 ; daño = 5 ; velocidad = 800
 	diablillo:
-		- rareza = poco-comun ; vida = 50 ; daño = 10 ; velocidad = 10 
+		- rareza = poco-comun ; vida = 15 ; daño = 10 ; velocidad = 300
 	vampiro:
-		- rareza = mini-jefe ; vida = 200 ; daño = 20 ; velocidad = 5 
+		- rareza = mini-jefe ; vida = 100 ; daño = 20 ; velocidad = 600
 	diablo:
-		- rareza = jefe ; vida = 500 ; daño = 80 ; velocidad = 1
+		- rareza = jefe ; vida = 500 ; daño = 80 ; velocidad = 1500
 */
 describe "Enemigos"{
-	test "Un Hombre Lobo tiene 15 de vida, 5 de daño"{
+	test "Un Hombre Lobo tiene 30 de vida, 5 de daño y se mueve cada 800ms"{
 		randomizador.habilitarTesteo()
 		const hombreLobo = generarEnemigo.hombreLobo()
-		assert.equals(15, hombreLobo.vida())
+		assert.equals(30, hombreLobo.vida())
 		assert.equals(5, hombreLobo.danio())
+		assert.equals(800, hombreLobo.velocidad())
 	}
-	test "Un Diablillo tiene 50 de vida, 10 de daño"{
+	test "Un Diablillo tiene 50 de vida, 10 de daño y se mueve cada 300ms"{
 		randomizador.habilitarTesteo()
 		const diablillo = generarEnemigo.diablillo()
-		assert.equals(50, diablillo.vida())
+		assert.equals(15, diablillo.vida())
 		assert.equals(10, diablillo.danio())
+		assert.equals(300, diablillo.velocidad())
 	}
-	test "Un Vampiro tiene 200 de vida, 20 de daño"{
+	test "Un Vampiro tiene 200 de vida, 20 de daño y se mueve cada 600ms"{
 		randomizador.habilitarTesteo()
 		const vampiro = generarEnemigo.vampiro()
-		assert.equals(200, vampiro.vida())
+		assert.equals(100, vampiro.vida())
 		assert.equals(20, vampiro.danio())
+		assert.equals(600, vampiro.velocidad())
 	}
-	test "Un Diablo tiene 500 de vida, 80 de daño"{
+	test "Un Diablo tiene 500 de vida, 80 de daño y se mueve cada 1500ms"{
 		randomizador.habilitarTesteo()
 		const diablo = generarEnemigo.diablo()
 		assert.equals(500, diablo.vida())
 		assert.equals(80, diablo.danio())
+		assert.equals(1500, diablo.velocidad())
 	}
 }

@@ -1,16 +1,7 @@
 import src.brujo.*
 import movimiento.*
 import wollok.game.*
-import tp.*
-// Tipos de Enemigos:
-// hombre lobo:
-// - rareza = comun ; vida = 15 ; daño = 5 ; velocidad = 6
-// diablillo:
-// - rareza = poco-comun ; vida = 50 ; daño = 10 ; velocidad = 10 
-// vampiro:
-// - rareza = mini-jefe ; vida = 200 ; daño = 20 ; velocidad = 5 
-// diablo:
-// - rareza = jefe ; vida = 500 ; daño = 80 ; velocidad = 1
+import textos.*
 
 
 class Enemigo{
