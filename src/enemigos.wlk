@@ -18,29 +18,29 @@ class Enemigo{
     const danio
     var imagen
     var posicion = new Position(x=0,y=0)
-
+    
     method text() = vida.toString()
     method textColor() = color.verde()
     method vida() = vida
-    method restarVida(danioRecibido, enemigos){ 
+    method restarVida(danioRecibido){ 
         if(! self.estaVivo())
             return null
-        if(vida < danioRecibido){
-            self.morir(enemigos)
+        if(vida <= danioRecibido){
+            self.morir()
         } else {
             vida -= danioRecibido
         }
         return null
     }
-    method morir(enemigos){
+    method morir(){
         vida = 0
         imagen = "muerte.png"
         game.schedule(500, { => game.removeVisual(self) })
-        game.schedule(501, { => enemigos.remove(self) })
     }
     method añadirAlJuego(){
         posicion = randomizador.generarPosicion()
         game.addVisual(self)
+        game.onTick(self.velocidad(), "movimiento_enemigo", { self.moverHacia(brujo) })
         return self
     }
     method danio() = danio
@@ -54,26 +54,40 @@ class Enemigo{
         brujo.perderVida(self.danio())
     }
     method moverHacia(brujo){
-        movimiento.moverHacia(self, brujo)
+        movimiento.moverHacia(self,brujo)
     }
+    method chanceDeAparecer()
+    method velocidad()
 }
 
 class HombreLobo inherits Enemigo(
-    vida = randomizador.generarEstadistica(15, 5), 
+    vida = randomizador.generarEstadistica(30, 20),
     danio = randomizador.generarEstadistica(5, 2),
-    imagen = "hombre_lobo.png"){}
+    imagen = "hombre_lobo.png"){
+        override method chanceDeAparecer() = 10
+        override method velocidad() = 800
+    }
 class Diablillo inherits Enemigo(
-    vida = randomizador.generarEstadistica(50, 5), 
+    vida = randomizador.generarEstadistica(15, 5),
     danio = randomizador.generarEstadistica(10, 3),
-    imagen = "diablillo.png"){}
+    imagen = "diablillo.png"){
+        override method chanceDeAparecer() = 4
+        override method velocidad() = 300
+    }
 class Vampiro inherits Enemigo(
-    vida = randomizador.generarEstadistica(200, 25), 
+    vida = randomizador.generarEstadistica(100, 25),
     danio = randomizador.generarEstadistica(20, 15),
-    imagen = "vampiro.png"){}
+    imagen = "vampiro.png"){
+        override method chanceDeAparecer() = 3
+        override method velocidad() = 600
+    }
 class Diablo inherits Enemigo(
     vida = randomizador.generarEstadistica(500, 0), 
     danio = randomizador.generarEstadistica(80, 10),
-    imagen = "diablo.png"){}
+    imagen = "diablo.png"){
+        override method chanceDeAparecer() = 1
+        override method velocidad() = 1500
+    }
 
 object generarEnemigo {
     method hombreLobo(){
@@ -89,25 +103,13 @@ object generarEnemigo {
         return new Diablo().añadirAlJuego()
     }
     method enemigo_aleatorio(){
-        const seed = 1.randomUpTo(10).floor()
-        var enemigo
-        if(seed % 4 == 0)
-            enemigo = self.hombreLobo()
-        if(seed % 4 == 1)
-            enemigo = self.diablillo()
-        if(seed % 4 == 2)
-            enemigo = self.vampiro()
-        if(seed % 4 == 3)
-            enemigo = self.diablo()
-        return enemigo
-        
-        // const enemigosAElegir = [
-        //     {self.hombreLobo()},
-        //     {self.diablillo()},
-        //     {self.vampiro()},
-        //     {self.diablo()}]
-        // const enemigo = enemigosAElegir.apply()
-        // return enemigo
+        var enemigosAElegir = []
+        enemigosAElegir = randomizador.aplicarChanceDeAparecer(enemigosAElegir, {new HombreLobo()})
+        enemigosAElegir = randomizador.aplicarChanceDeAparecer(enemigosAElegir, {new Diablillo()})
+        enemigosAElegir = randomizador.aplicarChanceDeAparecer(enemigosAElegir, {new Vampiro()})
+        enemigosAElegir = randomizador.aplicarChanceDeAparecer(enemigosAElegir, {new Diablo()})
+        enemigosAElegir.randomize()
+        return enemigosAElegir.first().apply().añadirAlJuego()
     }
 }
 
@@ -129,9 +131,15 @@ object randomizador{
         const posicionY = 0.randomUpTo(game.height() - 1).floor()
         var posicionGenerada = new Position(x = posicionX , y = posicionY)
 
-        if((!isTesting) and (game.getObjectsIn(posicionGenerada).size() > 0 or brujo.position().distance(posicionGenerada) < 4)){
+        if((!isTesting) and (brujo.position().distance(posicionGenerada) < 1)){
             posicionGenerada = self.generarPosicion()
         }
         return posicionGenerada
+    }
+    method aplicarChanceDeAparecer(listaDeEnemigos, generadorEnemigo){
+        const lista = listaDeEnemigos
+        const enemigo = generadorEnemigo.apply()
+        enemigo.chanceDeAparecer().times({ i => lista.add ( generadorEnemigo ) })
+        return lista
     }
 }

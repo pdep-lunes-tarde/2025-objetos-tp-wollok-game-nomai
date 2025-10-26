@@ -46,7 +46,7 @@ object brujo{
         const disparo = new DisparoCercano ( posicion = self.position() , enemigo_fijado = enemigo_mas_cercano )
         game.onCollideDo(disparo, {
             objetivo => 
-            disparo.golpeasteAEnemigo(objetivo, enemigos, self)
+            disparo.golpeasteAEnemigo(objetivo, self)
             }
         )
         game.addVisual(disparo)
@@ -94,10 +94,10 @@ class DisparoCercano {
         game.removeVisual(self)
     }
 
-    method golpeasteAEnemigo(enemigo, enemigos, brujo){
+    method golpeasteAEnemigo(enemigo, brujo){
         if(enemigo != self.objetivo())
             return null
-        enemigo.restarVida(self.danio_inflijido(), enemigos)
+        enemigo.restarVida(self.danio_inflijido())
         brujo.aumentarDanioRealizado(self.danio_inflijido())
         brujo.aumentarEnemigosEliminados(enemigo)
         self.matar()

@@ -10,7 +10,7 @@ object color {
     const property rojo =  "FF8888FF"
 }
 
-object textoFinal{
+object textoResultadoFinal{
     const posicion = new Position(x = brujosYdiablos.ancho() / 2, y = brujosYdiablos.alto() - 4)
     var texto = ""
     var colorTexto = color.verde()
@@ -27,11 +27,19 @@ object textoFinal{
     method position() = posicion
 }
 
-object textoVolverAJugar{
+object textoJugar{
+    var texto = ""
     const posicion = new Position(x = brujosYdiablos.ancho() / 2, y = 4)
-    method text() = "Para volver a jugar presiona la tecla 'Espacio'!"
+    method text() = "Para " + texto + " presiona la tecla 'Espacio'!"
     method textColor() = color.blanco()
     method position() = posicion
+
+    method iniciarMenu(){
+        texto = "iniciar el juego"
+    }
+    method reiniciarJuego(){
+        texto = "volver a jugar"
+    }
 }
 
 object brujosYdiablos {
@@ -41,18 +49,16 @@ object brujosYdiablos {
 
     const proyectiles = []
     const enemigos = []
-    const paredes = []
+    // const paredes = []
 
-    method configurar(){
+    method configurarPantalla(){
+        game.width(self.alto())
+        game.height(self.ancho())
+        game.cellSize(32)
         game.ground("pasto.png")
+    }
 
-        enemigos.add(generarEnemigo.diablillo())
-        enemigos.add(generarEnemigo.diablillo())
-        game.addVisual(brujo)
-        // paredes.forEach { pared => game.addVisual(pared) }
-
-        
-        
+    method configurarMovimientoJugador(){
         keyboard.w().onPressDo {
             brujo.mover(arriba)
         }
@@ -65,46 +71,63 @@ object brujosYdiablos {
         keyboard.d().onPressDo {
             brujo.mover(derecha)
         }
+    }
+    
+
+    method iniciarMenu(){
+        game.addVisual(brujo)
+
+        self.configurarMovimientoJugador()
+
+        textoJugar.iniciarMenu()
+        game.addVisual(textoJugar)
+
+        keyboard.space().onPressDo({ self.reiniciar() })
+    }
+
+    method configurarJuego(){
+        enemigos.add(generarEnemigo.diablillo())
+        enemigos.add(generarEnemigo.diablillo())
+        game.addVisual(brujo)
+        
+        self.configurarMovimientoJugador()
 
         game.onCollideDo(brujo, { cosa => cosa.golpeasteABrujo(brujo) })
-        game.onTick(500, "movimiento_enemigos", { enemigos.forEach { enemigo => enemigo.moverHacia(brujo) } })
         game.onTick(200, "movimiento_proyectiles", { proyectiles.forEach { proyectil => proyectil.moverHacia(enemigos, brujo) } } )
         game.onTick(1500, "disparo", { proyectiles.add(brujo.disparar(enemigos)) })
         game.onTick(3000, "generacion_enemigos", { enemigos.add(generarEnemigo.enemigo_aleatorio()) })
+        game.onTick(3000, "eliminacion_enemigos_muertos", { enemigos.forEach { enemigo => if(!enemigo.estaVivo()) enemigos.remove(enemigo) } })
     }
 
     method finalizar(resultado){
         brujo.position(game.center())
         game.clear()
         enemigos.clear()
-        paredes.clear()
+        // paredes.clear()
         game.addVisual(brujo)
-        resultado.apply(textoFinal)
-        game.addVisual(textoFinal)
-        game.addVisual(textoVolverAJugar)
+        resultado.apply(textoResultadoFinal)
+        game.addVisual(textoResultadoFinal)
+        textoJugar.reiniciarJuego()
+        game.addVisual(textoJugar)
         keyboard.space().onPressDo({ self.reiniciar() })
     }
     method perder(){
-        game.ground("fondo_perder.png")
-        self.finalizar({t => t.derrota()})
+        self.finalizar({texto => texto.derrota()})
     }
 
     method ganar(){
-        self.finalizar({t => t.victoria()})
+        self.finalizar({texto => texto.victoria()})
     }
 
     method reiniciar(){
         game.clear()
         brujo.reiniciar()
-        self.configurar()
+        self.configurarJuego()
     }
 
     method iniciar(){
-        game.width(self.alto())
-        game.height(self.ancho())
-        game.cellSize(32)
-
-        self.configurar()
+        self.configurarPantalla()
+        self.iniciarMenu()
 
         game.start()
     }
