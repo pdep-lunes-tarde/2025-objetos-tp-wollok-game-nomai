@@ -8,8 +8,6 @@ object brujo{
     var vida = 100
     var enemigosEliminados = 0
     var danio_realizado = 0
-    // const magia
-    // const mejoras = []
 
     method image() = "brujo_" + direccionImagen.toString() + ".png"
     method position() = posicion
@@ -38,18 +36,11 @@ object brujo{
     }
 
     method disparar(enemigos){
-        if(enemigos.size() == 0)
-            return null
-        const enemigo_mas_cercano = enemigos.min {
-            unEnemigo => unEnemigo.position().distance(self.position())
+        const enemigo_mas_cercano = enemigos.min { unEnemigo => unEnemigo.position().distance(self.position()) }
+        const disparo = new DisparoCercano ( posicion = self.position(), enemigo_fijado = enemigo_mas_cercano )
+        if(enemigos.size() > 0){
+            brujosYdiablos.agregarDisparo(disparo)
         }
-        const disparo = new DisparoCercano ( posicion = self.position() , enemigo_fijado = enemigo_mas_cercano )
-        game.onCollideDo(disparo, {
-            objetivo => 
-            disparo.golpeasteAEnemigo(objetivo, self)
-            }
-        )
-        game.addVisual(disparo)
         return disparo
     }
 
@@ -91,21 +82,19 @@ class DisparoCercano {
     method estaVivo() = estaVivo
     method matar() {
         estaVivo = false
-        game.removeVisual(self)
+        brujosYdiablos.removerDisparo(self)
     }
 
-    method golpeasteAEnemigo(enemigo, brujo){
-        if(enemigo != self.objetivo())
-            return null
-        enemigo.restarVida(self.danio_inflijido())
-        brujo.aumentarDanioRealizado(self.danio_inflijido())
-        brujo.aumentarEnemigosEliminados(enemigo)
-        self.matar()
-        return null
+    method golpeasteA(enemigo){
+        if(enemigo == self.objetivo()){
+            enemigo.restarVida(self.danio_inflijido())
+            brujo.aumentarDanioRealizado(self.danio_inflijido())
+            brujo.aumentarEnemigosEliminados(enemigo)
+            self.matar()
+        }
     }
-    method golpeasteABrujo(_brujo) {}
 
-    method moverHacia(enemigos, brujo){
+    method mover(){
         movimiento.moverHacia(self, enemigo_fijado)
         if(! enemigo_fijado.estaVivo())
             self.matar()

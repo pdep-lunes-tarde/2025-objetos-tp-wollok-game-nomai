@@ -40,17 +40,19 @@ describe "Movimiento"{
 
 	test "Al moverse un proyectil hacia su objetivo, elige la posicion mas cercana a él"{
 		randomizador.habilitarTesteo()
-		const posicionEnemigo = new Position(x = 4, y = 10)
-		const enemigo = generarEnemigo.diablo()
-		enemigo.position(posicionEnemigo)
-		const enemigos = [enemigo]
 
-		const posicionBrujo = new Position(x=10, y=10)
-		brujo.position(posicionBrujo)
+		brujo.position(new Position(x=10, y=10))
+
+		const enemigoCercano = generarEnemigo.diablo()
+		enemigoCercano.position(new Position(x = 4, y = 10))
+		const enemigoLejano = generarEnemigo.diablo()
+		enemigoLejano.position(new Position(x = 10, y = 1))
+		const enemigos = [enemigoCercano, enemigoLejano]
+
 		const proyectil = brujo.disparar(enemigos)
 
 		const posicionEsperada = new Position(x=9, y=10)
-		proyectil.moverHacia(enemigos, brujo)
+		proyectil.mover()
 
 		assert.equals(posicionEsperada, proyectil.position())
 	}
@@ -63,7 +65,7 @@ describe "Movimiento"{
 		const proyectil = brujo.disparar(enemigos)
 
 		enemigo.morir()
-		proyectil.moverHacia(enemigos, brujo)
+		proyectil.mover()
 
 		assert.equals(false, proyectil.estaVivo())
 	}
@@ -86,7 +88,7 @@ describe "Colisiones"{
 
 		const proyectil = brujo.disparar(enemigos)
 
-		proyectil.golpeasteAEnemigo(enemigo, brujo)
+		proyectil.golpeasteA(enemigo)
 
 		assert.equals(480, enemigo.vida())
 	}
@@ -98,7 +100,7 @@ describe "Colisiones"{
 
 		const proyectil = brujo.disparar(enemigos)
 
-		proyectil.golpeasteAEnemigo(enemigo, brujo)
+		proyectil.golpeasteA(enemigo)
 
 		assert.equals(false, enemigo.estaVivo())
 	}
@@ -110,7 +112,7 @@ describe "Colisiones"{
 
 		const proyectil = brujo.disparar(enemigos)
 
-		proyectil.golpeasteAEnemigo(enemigo, brujo)
+		proyectil.golpeasteA(enemigo)
 
 		assert.equals(false, proyectil.estaVivo())
 	}

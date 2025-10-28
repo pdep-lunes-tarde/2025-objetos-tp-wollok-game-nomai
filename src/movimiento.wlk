@@ -1,5 +1,6 @@
 import src.tp.*
 object movimiento{
+    const direccionesPosibles = [arriba,abajo,izquierda,derecha]
     method movimiento(objetoAMoverse, direccion) = direccion.siguientePosicion(objetoAMoverse.position())
     method estaEnPantalla(posicion) {
         return 
@@ -7,15 +8,13 @@ object movimiento{
             (posicion.x() < brujosYdiablos.ancho() and posicion.y() < brujosYdiablos.alto())
     }
     method moverHacia(objetoAMoverse, objetivo){
-        if(! objetoAMoverse.estaVivo())
-            return null
-        const direccionesPosibles = [arriba,abajo,izquierda,derecha]
-        // hace un map para conseguir todas las posiciones a las que se puede mover el enemigo
-        const posicionesPosibles = direccionesPosibles.map{ unaDireccion => self.movimiento(objetoAMoverse,unaDireccion) }
-        // consigue la posicion que menor distancia tiene hacia el objetivo
-        const mejorPosicion = posicionesPosibles.min { unaPosicion => unaPosicion.distance(objetivo.position()) }
-        objetoAMoverse.position(mejorPosicion)
-        return null
+        if(objetoAMoverse.estaVivo()){
+            // hace un map para conseguir todas las posiciones a las que se puede mover el enemigo
+            const posicionesPosibles = direccionesPosibles.map{ unaDireccion => self.movimiento(objetoAMoverse,unaDireccion) }
+            // consigue la posicion que menor distancia tiene hacia el objetivo
+            const mejorPosicion = posicionesPosibles.min { unaPosicion => unaPosicion.distance(objetivo.position()) }
+            objetoAMoverse.position(mejorPosicion)
+        }
     }
 }
 

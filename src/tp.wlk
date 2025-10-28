@@ -9,7 +9,6 @@ object brujosYdiablos {
     method ancho() = 16
     method scoreParaGanar() = 10
 
-    const proyectiles = []
     const enemigos = []
 
     method configurarPantalla(){
@@ -47,18 +46,40 @@ object brujosYdiablos {
     }
 
     method configurarJuego(){
-        enemigos.add(generarEnemigo.diablillo())
-        enemigos.add(generarEnemigo.diablillo())
+        self.agregarEnemigo(generarEnemigo.diablillo())
+        self.agregarEnemigo(generarEnemigo.diablillo())
         game.addVisual(brujo)
         game.addVisual(textoVidaDelBrujo)
         
         self.configurarMovimientoJugador()
 
         game.onCollideDo(brujo, { cosa => cosa.golpeasteABrujo(brujo) })
-        game.onTick(200, "movimiento_proyectiles", { proyectiles.forEach { proyectil => proyectil.moverHacia(enemigos, brujo) } } )
-        game.onTick(1500, "disparo", { proyectiles.add(brujo.disparar(enemigos)) })
-        game.onTick(3000, "generacion_enemigos", { enemigos.add(generarEnemigo.enemigo_aleatorio()) })
-        game.onTick(3000, "eliminacion_enemigos_muertos", { enemigos.forEach { enemigo => if(!enemigo.estaVivo()) enemigos.remove(enemigo) } })
+        game.onTick(1500, "disparo", { brujo.disparar(enemigos) })
+        game.onTick(3000, "generacion_enemigos", { self.agregarEnemigo(generarEnemigo.enemigo_aleatorio()) })
+    }
+
+    method agregarDisparo(disparo){
+        game.onCollideDo(disparo, {
+            unEnemigo => 
+            disparo.golpeasteA(unEnemigo)
+            }
+        )
+        game.addVisual(disparo)
+        game.onTick(200, "movimiento_proyectiles", { disparo.mover() })
+    }
+    method removerDisparo(disparo){
+        game.removeVisual(disparo)
+    }
+
+    method removerEnemigo(enemigo){
+        enemigos.remove(enemigo) 
+        game.removeVisual(enemigo)
+    }
+    method agregarEnemigo(enemigo){
+        enemigo.position(randomizador.generarPosicion())
+        enemigos.add(enemigo)
+        game.addVisual(enemigo)
+        game.onTick(enemigo.velocidad(), "movimiento_enemigo", { enemigo.moverHacia(brujo) })
     }
 
     method finalizar(resultado){
