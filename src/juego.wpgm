@@ -1,3 +1,5 @@
-program juego {
+import tp.*
 
+program juego {
+    brujosYdiablos.iniciar()
 }
