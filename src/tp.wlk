@@ -5,11 +5,10 @@ import movimiento.*
 import textos.*
 
 object brujosYdiablos {
-    method alto() = 16
-    method ancho() = 16
-    method scoreParaGanar() = 10
+    method alto() = 20
+    method ancho() = 20
+    method scoreParaGanar() = 1000
 
-    const enemigos = []
 
     method configurarPantalla(){
         game.width(self.alto())
@@ -18,7 +17,7 @@ object brujosYdiablos {
         game.ground("pasto.png")
     }
 
-    method configurarMovimientoJugador(){
+    method configurarJugador(){
         keyboard.w().onPressDo {
             brujo.mover(arriba)
         }
@@ -31,31 +30,39 @@ object brujosYdiablos {
         keyboard.d().onPressDo {
             brujo.mover(derecha)
         }
+        keyboard.space().onPressDo{
+            brujo.rotarHechizo()
+        }
     }
     
 
     method iniciarMenu(){
         game.addVisual(brujo)
 
-        self.configurarMovimientoJugador()
-
         textoJugar.iniciarMenu()
         game.addVisual(textoJugar)
+        game.addVisual(titulo)
 
         keyboard.space().onPressDo({ self.reiniciar() })
     }
+
+    const enemigos = []
+    var tiempoJugado = 0
+    method tiempoJugado() = tiempoJugado
 
     method configurarJuego(){
         self.agregarEnemigo(generarEnemigo.diablillo())
         self.agregarEnemigo(generarEnemigo.diablillo())
         game.addVisual(brujo)
-        game.addVisual(textoVidaDelBrujo)
+        game.addVisual(textoVidaDelBrujoYScore)
         
-        self.configurarMovimientoJugador()
+        self.configurarJugador()
 
-        game.onCollideDo(brujo, { cosa => cosa.golpeasteABrujo(brujo) })
+        game.onCollideDo(brujo, { cosa => cosa.golpeasteABrujo() })
         game.onTick(1500, "disparo", { brujo.disparar(enemigos) })
         game.onTick(3000, "generacion_enemigos", { self.agregarEnemigo(generarEnemigo.enemigo_aleatorio()) })
+        
+        game.onTick(1000, "tiempo_jugando", { tiempoJugado += 1 })
     }
 
     method agregarDisparo(disparo){
@@ -65,21 +72,23 @@ object brujosYdiablos {
             }
         )
         game.addVisual(disparo)
-        game.onTick(200, "movimiento_proyectiles", { disparo.mover() })
+        game.onTick(200, "movimiento_proyectiles" + disparo.seed(), { disparo.mover() })
     }
     method removerDisparo(disparo){
+        game.removeTickEvent("movimiento_proyectiles" + disparo.seed())
         game.removeVisual(disparo)
     }
 
     method removerEnemigo(enemigo){
         enemigos.remove(enemigo) 
+        game.removeTickEvent("movimiento_enemigo" + enemigo.seed())
         game.removeVisual(enemigo)
     }
     method agregarEnemigo(enemigo){
         enemigo.position(randomizador.generarPosicion())
-        enemigos.add(enemigo)
         game.addVisual(enemigo)
-        game.onTick(enemigo.velocidad(), "movimiento_enemigo", { enemigo.moverHacia(brujo) })
+        enemigos.add(enemigo)
+        game.onTick(enemigo.velocidad(), "movimiento_enemigo" + enemigo.seed(), { enemigo.moverHacia(brujo) })
     }
 
     method finalizar(resultado){

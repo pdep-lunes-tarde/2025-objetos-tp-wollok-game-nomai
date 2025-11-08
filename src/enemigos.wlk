@@ -7,11 +7,13 @@ import textos.*
 
 class Enemigo{
     var vida
-    const danio
-    const chanceDeAparecer
-    const velocidad
+    const property danio
+    const property chanceDeAparecer
+    const property velocidad
+    const property scorePorMuerte
     var imagen
     var posicion = new Position(x=0,y=0)
+    const seed = 0.randomUpTo(10).toString()
     
     method text() = vida.toString()
     method textColor() = color.verde()
@@ -30,21 +32,19 @@ class Enemigo{
         imagen = "muerte.png"
         game.schedule(500, { => brujosYdiablos.removerEnemigo(self) })
     }
-    method danio() = danio
     method image() = imagen
     method position() = posicion
     method position(nuevaPosicion){ 
         posicion = nuevaPosicion 
     }
+    method seed() = seed
     method estaVivo() = vida > 0
-    method golpeasteABrujo(brujo){
+    method golpeasteABrujo(){
         brujo.perderVida(self.danio())
     }
     method moverHacia(brujo){
         movimiento.moverHacia(self,brujo)
     }
-    method chanceDeAparecer() = chanceDeAparecer
-    method velocidad() = velocidad
 }
 
 object generarEnemigo {
@@ -54,6 +54,7 @@ object generarEnemigo {
             danio = randomizador.generarEstadistica(5, 2),
             chanceDeAparecer = 10,
             velocidad = 800,
+            scorePorMuerte = 10,
             imagen = "hombre_lobo.png"
         )
         return enemigoGenerado
@@ -64,6 +65,7 @@ object generarEnemigo {
             danio = randomizador.generarEstadistica(10, 3),
             chanceDeAparecer = 4,
             velocidad = 300,
+            scorePorMuerte = 5,
             imagen = "diablillo.png"
         )
         return enemigoGenerado
@@ -74,6 +76,7 @@ object generarEnemigo {
             danio = randomizador.generarEstadistica(20, 15),
             chanceDeAparecer = 3,
             velocidad = 600,
+            scorePorMuerte = 30,
             imagen = "vampiro.png"
         )
         return enemigoGenerado
@@ -84,6 +87,7 @@ object generarEnemigo {
             danio = randomizador.generarEstadistica(80, 10),
             chanceDeAparecer = 1,
             velocidad = 1500,
+            scorePorMuerte = 250,
             imagen = "diablo.png"
         )
         return enemigoGenerado

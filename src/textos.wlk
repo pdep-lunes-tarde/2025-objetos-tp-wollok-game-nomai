@@ -8,28 +8,26 @@ object color {
 }
 
 object textoResultadoFinal{
-    const posicion = new Position(x = brujosYdiablos.ancho() / 2, y = brujosYdiablos.alto() - 4)
     var texto = ""
-    var colorTexto = color.verde()
+    var colorTexto = color.blanco()
     method victoria(){
-        texto = "Ganaste! Derrotaste a " + brujo.enemigosEliminados() + " enemigos"
+        texto = "¡GANASTE!\n\nTu score fue " + brujo.score() + ".\n Realizaste " + brujo.danio_realizado() + " puntos de daño.\nSobreviviste por " + brujosYdiablos.tiempoJugado() + " segundos."
         colorTexto = color.verde()
     }
     method derrota(){
-        texto = "Perdiste"
+        texto = "Perdiste :("
         colorTexto = color.rojo()
     }
     method text() = texto
     method textColor() = colorTexto
-    method position() = posicion
+    method position() = new Position(x = brujosYdiablos.ancho() / 2, y = brujosYdiablos.alto() - 4)
 }
 
 object textoJugar{
     var texto = ""
-    const posicion = new Position(x = brujosYdiablos.ancho() / 2, y = 4)
     method text() = "Para " + texto + " presiona la tecla 'Espacio'!"
     method textColor() = color.blanco()
-    method position() = posicion
+    method position() = new Position(x = brujosYdiablos.ancho() / 2, y = 2)
 
     method iniciarMenu(){
         texto = "iniciar el juego"
@@ -39,9 +37,13 @@ object textoJugar{
     }
 }
 
-object textoVidaDelBrujo{
-    const posicion = new Position(x = 1, y = brujosYdiablos.alto() - 1)
-    method text() = "Vida: " + brujo.vida()
+object titulo{
+    method position() = new Position(x = brujosYdiablos.ancho() / 2 - 5, y = brujosYdiablos.alto() - 8)
+    method image() = "titulo.png"
+}
+
+object textoVidaDelBrujoYScore{
+    method text() = "Vida: " + brujo.vida() + "\nScore:" + brujo.score()
     method textColor() = color.blanco()
-    method position() = posicion
+    method position() = new Position(x = 1, y = brujosYdiablos.alto() - 1)
 }
