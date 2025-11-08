@@ -6,8 +6,7 @@ object brujo{
     var direccionImagen = derecha
 
     var vida = 100
-    var score = 0
-    var danio_realizado = 0
+    var danioRealizado = 0
 
     var magia = magiaCercana
 
@@ -20,6 +19,10 @@ object brujo{
     method rotarHechizo(){
         magia = magia.magiaProxima()
     }
+    method elegirHechizo(magiaElegida){
+        magia = magiaElegida
+    }
+    method magia() = magia
     method mover(direccion) {
         if(direccion.horizontal())
             direccionImagen = direccion
@@ -43,22 +46,14 @@ object brujo{
     method disparar(enemigos) = magia.lanzarHechizo(enemigos)
 
     method aumentarDanioRealizado(danio){
-        danio_realizado += danio
+        danioRealizado += danio
     }
 
-    method danio_realizado() = danio_realizado
-    method score() = score
-    method aumentarScore(enemigo){
-        if(! enemigo.estaVivo())
-            score += enemigo.scorePorMuerte()
-        if(score >= brujosYdiablos.scoreParaGanar())
-            brujosYdiablos.ganar()
-    }
+    method danioRealizado() = danioRealizado
 
     method reiniciar(){
         vida = 100
-        score = 0
-        danio_realizado = 0
+        danioRealizado = 0
         posicion = game.center()
         direccionImagen = derecha
         magia = magiaCercana
@@ -80,7 +75,7 @@ class Magia{
         const disparo = new Hechizo(
             enemigo_fijado = self.objetivo(enemigos),
             imagen = self.image(),
-            danio_inflijido = self.danio()
+            danioInflijido = self.danio()
         )
         brujosYdiablos.agregarDisparo(disparo)
         return disparo
@@ -115,7 +110,7 @@ class Hechizo {
     var posicion = brujo.position()
     const imagen
     var estaVivo = true
-    const danio_inflijido
+    const danioInflijido
     const enemigo_fijado
     const seed = 0.randomUpTo(10).toString()
 
@@ -125,7 +120,7 @@ class Hechizo {
     }
     method image() = imagen
     method objetivo() = enemigo_fijado
-    method danio_inflijido() = danio_inflijido
+    method danioInflijido() = danioInflijido
     method estaVivo() = estaVivo
     method seed() = seed
 
@@ -140,9 +135,9 @@ class Hechizo {
 
     method golpeasteA(enemigo){
         if(enemigo == self.objetivo()){
-            enemigo.restarVida(self.danio_inflijido())
-            brujo.aumentarScore(enemigo)
-            brujo.aumentarDanioRealizado(self.danio_inflijido())
+            enemigo.restarVida(self.danioInflijido())
+            brujosYdiablos.aumentarScore(enemigo)
+            brujo.aumentarDanioRealizado(self.danioInflijido())
             self.matar()
         }
     }

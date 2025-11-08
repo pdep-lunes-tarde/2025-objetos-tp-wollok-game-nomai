@@ -48,9 +48,20 @@ object brujosYdiablos {
 
     const enemigos = []
     var tiempoJugado = 0
+    var score = 0
     method tiempoJugado() = tiempoJugado
+    method score() = score
+    method aumentarScore(enemigo){
+        if(! enemigo.estaVivo())
+            score += enemigo.scorePorMuerte()
+        if(score >= self.scoreParaGanar())
+            self.ganar()
+    }
 
     method configurarJuego(){
+        tiempoJugado = 0
+        score = 0
+
         self.agregarEnemigo(generarEnemigo.diablillo())
         self.agregarEnemigo(generarEnemigo.diablillo())
         game.addVisual(brujo)

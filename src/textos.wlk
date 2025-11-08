@@ -11,7 +11,7 @@ object textoResultadoFinal{
     var texto = ""
     var colorTexto = color.blanco()
     method victoria(){
-        texto = "¡GANASTE!\n\nTu score fue " + brujo.score() + ".\n Realizaste " + brujo.danio_realizado() + " puntos de daño.\nSobreviviste por " + brujosYdiablos.tiempoJugado() + " segundos."
+        texto = "¡GANASTE!\n\nTu score fue " + brujosYdiablos.score() + ".\n Realizaste " + brujo.danioRealizado() + " puntos de daño.\nSobreviviste por " + brujosYdiablos.tiempoJugado() + " segundos."
         colorTexto = color.verde()
     }
     method derrota(){
@@ -43,7 +43,7 @@ object titulo{
 }
 
 object textoVidaDelBrujoYScore{
-    method text() = "Vida: " + brujo.vida() + "\nScore:" + brujo.score()
+    method text() = "Vida: " + brujo.vida() + "\nScore:" + brujosYdiablos.score()
     method textColor() = color.blanco()
     method position() = new Position(x = 1, y = brujosYdiablos.alto() - 1)
 }
