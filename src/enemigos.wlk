@@ -52,7 +52,7 @@ object generarEnemigo {
         const enemigoGenerado = new Enemigo(
             vida = randomizador.generarEstadistica(30, 20),
             danio = randomizador.generarEstadistica(5, 2),
-            chanceDeAparecer = 10,
+            chanceDeAparecer = 50,
             velocidad = 800,
             scorePorMuerte = 10,
             imagen = "hombre_lobo.png"
@@ -63,7 +63,7 @@ object generarEnemigo {
         const enemigoGenerado = new Enemigo(
             vida = randomizador.generarEstadistica(15, 5),
             danio = randomizador.generarEstadistica(10, 3),
-            chanceDeAparecer = 4,
+            chanceDeAparecer = 30,
             velocidad = 300,
             scorePorMuerte = 5,
             imagen = "diablillo.png"
@@ -74,7 +74,7 @@ object generarEnemigo {
         const enemigoGenerado = new Enemigo(
             vida = randomizador.generarEstadistica(100, 25),
             danio = randomizador.generarEstadistica(20, 15),
-            chanceDeAparecer = 3,
+            chanceDeAparecer = 15,
             velocidad = 600,
             scorePorMuerte = 30,
             imagen = "vampiro.png"
@@ -85,7 +85,7 @@ object generarEnemigo {
         const enemigoGenerado = new Enemigo(
             vida = randomizador.generarEstadistica(500, 0), 
             danio = randomizador.generarEstadistica(80, 10),
-            chanceDeAparecer = 1,
+            chanceDeAparecer = 5,
             velocidad = 1500,
             scorePorMuerte = 250,
             imagen = "diablo.png"
@@ -93,13 +93,8 @@ object generarEnemigo {
         return enemigoGenerado
     }
     method enemigo_aleatorio(){
-        var enemigosAElegir = []
-        enemigosAElegir = randomizador.aplicarChanceDeAparecer(enemigosAElegir, {self.hombreLobo()})
-        enemigosAElegir = randomizador.aplicarChanceDeAparecer(enemigosAElegir, {self.diablillo()})
-        enemigosAElegir = randomizador.aplicarChanceDeAparecer(enemigosAElegir, {self.vampiro()})
-        enemigosAElegir = randomizador.aplicarChanceDeAparecer(enemigosAElegir, {self.diablo()})
-        enemigosAElegir.randomize()
-        return enemigosAElegir.first().apply()
+        const enemigosAElegir = [self.hombreLobo(), self.diablillo(), self.vampiro(), self.diablo()]
+        return randomizador.aplicarChanceDeAparecer(enemigosAElegir)
     }
 }
 
@@ -126,10 +121,22 @@ object randomizador{
         }
         return posicionGenerada
     }
-    method aplicarChanceDeAparecer(listaDeEnemigos, generadorEnemigo){
-        const lista = listaDeEnemigos
-        const enemigo = generadorEnemigo.apply()
-        enemigo.chanceDeAparecer().times({ i => lista.add ( generadorEnemigo ) })
-        return lista
+    method aplicarChanceDeAparecer(listaDeEnemigos){
+        const probabilidadTotal = listaDeEnemigos.sum { enemigo => enemigo.chanceDeAparecer() }
+        var random = 0.randomUpTo(probabilidadTotal).floor()
+        listaDeEnemigos.removeAllSuchThat(
+            {
+                enemigo =>
+                const randomActual = random
+                random = random - enemigo.chanceDeAparecer()
+                return randomActual > enemigo.chanceDeAparecer()
+            }
+        )
+        return listaDeEnemigos.first()
+    }
+    method generarCartas(){
+        // genera 3 cartas
+
+        return [1,2,3]
     }
 }
