@@ -45,11 +45,14 @@ object brujo{
 
     method disparar(enemigos) = magia.lanzarHechizo(enemigos)
 
+    method danioRealizado() = danioRealizado
     method aumentarDanioRealizado(danio){
         danioRealizado += danio
     }
 
-    method danioRealizado() = danioRealizado
+    method subirDeNivel(mejora){
+        
+    }
 
     method reiniciar(){
         vida = 100
@@ -62,11 +65,13 @@ object brujo{
 
 // magias
 class Magia{
+    var danio
+    var velocidad = 200
     method objetivo(enemigos)
     method image()
     method position() = new Position(x = 5, y = 5)
     method magiaProxima()
-    method danio()
+    method danio() = danio
 
     method lanzarHechizo(enemigos){
         if(enemigos.size() == 0){
@@ -81,25 +86,27 @@ class Magia{
         return disparo
     }
 }
-object magiaCercana inherits Magia{
+object magiaCercana inherits Magia(danio = 20){
     override method objetivo(enemigos) = enemigos.min { unEnemigo => unEnemigo.position().distance(brujo.position()) }
-    override method danio() = 20
     
     override method image() = "magia_cercana.png"
 
     override method magiaProxima() = magiaLejana
 }
-object magiaLejana inherits Magia{
+object magiaLejana inherits Magia(danio = 40){
     override method objetivo(enemigos) = enemigos.max { unEnemigo => unEnemigo.position().distance(brujo.position()) }
-    override method danio() = 10
-    
     override method image() = "magia_lejana.png"
+    method mejorar(mejora){
+        if(mejora.tipo() == "daño")
+            danio += mejora.cantidadMejorada()
+        if(mejora.tipo() == "velocidad")
+            velocidad += mejora.cantidadMejorada()
+    }
     
     override method magiaProxima() = magiaAleatoria
 }
-object magiaAleatoria inherits Magia{
+object magiaAleatoria inherits Magia(danio = 10){
     override method objetivo(enemigos) = enemigos.anyOne()
-    override method danio() = 100
     
     override method image() = "magia_aleatoria.png"
     

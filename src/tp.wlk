@@ -1,3 +1,4 @@
+import src.mejoras.*
 import src.brujo.*
 import wollok.game.*
 import src.enemigos.*
@@ -36,13 +37,20 @@ object brujosYdiablos {
     }
     
 
+    var property dificultad = 3
     method iniciarMenu(){
         game.addVisual(brujo)
 
-        textoJugar.iniciarMenu()
-        game.addVisual(textoJugar)
         game.addVisual(titulo)
+        textoJugar.menuIniciar()
+        game.addVisual(textoJugar)
+        game.addVisual(textoDificultad)
 
+        keyboard.num1().onPressDo({ self.dificultad(1) })
+        keyboard.num2().onPressDo({ self.dificultad(2) })
+        keyboard.num3().onPressDo({ self.dificultad(3) })
+        keyboard.num4().onPressDo({ self.dificultad(4) })
+        keyboard.num5().onPressDo({ self.dificultad(5) })
         keyboard.space().onPressDo({ self.reiniciar() })
     }
 
@@ -76,6 +84,13 @@ object brujosYdiablos {
         game.onTick(1000, "tiempo_jugando", { tiempoJugado += 1 })
     }
 
+    method mostrarMejora(mejora){
+        const mejoraMostrada = new TextoMejora(mejora = mejora)
+        game.addVisual(mejoraMostrada)
+        game.schedule(1500, {
+            game.removeVisual(mejoraMostrada)
+        })
+    }
     method agregarDisparo(disparo){
         game.onCollideDo(disparo, {
             unEnemigo => 
@@ -109,7 +124,7 @@ object brujosYdiablos {
         game.addVisual(brujo)
         resultado.apply(textoResultadoFinal)
         game.addVisual(textoResultadoFinal)
-        textoJugar.reiniciarJuego()
+        textoJugar.menuReiniciar()
         game.addVisual(textoJugar)
         keyboard.space().onPressDo({ self.reiniciar() })
     }

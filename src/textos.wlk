@@ -3,8 +3,10 @@ import tp.*
 import brujo.*
 object color {
     const property blanco =  "FFFFFFFF"
+    const property rojo =  "FF7777FF"
     const property verde = "00FF00FF"
-    const property rojo =  "FF8888FF"
+    const property azul =  "0088FF7FF"
+    const property amarillo =  "FFFF00FF"
 }
 
 object textoResultadoFinal{
@@ -27,12 +29,12 @@ object textoJugar{
     var texto = ""
     method text() = "Para " + texto + " presiona la tecla 'Espacio'!"
     method textColor() = color.blanco()
-    method position() = new Position(x = brujosYdiablos.ancho() / 2, y = 2)
+    method position() = new Position(x = brujosYdiablos.ancho() / 2, y = 3)
 
-    method iniciarMenu(){
+    method menuIniciar(){
         texto = "iniciar el juego"
     }
-    method reiniciarJuego(){
+    method menuReiniciar(){
         texto = "volver a jugar"
     }
 }
@@ -46,4 +48,16 @@ object textoVidaDelBrujoYScore{
     method text() = "Vida: " + brujo.vida() + "\nScore:" + brujosYdiablos.score()
     method textColor() = color.blanco()
     method position() = new Position(x = 1, y = brujosYdiablos.alto() - 1)
+}
+
+object textoDificultad {
+    method text() = "Seleccione la dificultad presionando un numero del 1 al 5\nDificultad: " + brujosYdiablos.dificultad()
+    method textColor() = color.blanco()
+    method position() = new Position(x = brujosYdiablos.ancho() / 2, y = 5)
+}
+class TextoMejora {
+    const mejora
+    method text() = "¡Aumentar " + mejora.tipo() + " por " + mejora.cantidadMejorada() + "!"
+    method textColor() = mejora.color()
+    method position() = brujo.position().up(1)
 }

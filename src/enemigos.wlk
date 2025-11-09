@@ -7,9 +7,9 @@ import textos.*
 
 class Enemigo{
     var vida
-    const property danio
+    const danio
     const property chanceDeAparecer
-    const property velocidad
+    const velocidad
     const property scorePorMuerte
     var imagen
     var posicion = new Position(x=0,y=0)
@@ -27,6 +27,8 @@ class Enemigo{
             }
         }
     }
+    method danio() = danio * brujosYdiablos.dificultad()
+    method velocidad() = velocidad / (0.4 * brujosYdiablos.dificultad())
     method morir(){
         vida = 0
         imagen = "muerte.png"
