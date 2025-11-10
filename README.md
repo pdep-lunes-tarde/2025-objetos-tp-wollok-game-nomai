@@ -1,8 +1,19 @@
 # Grupo
 
-Nombre: **COMPLETAR ACA**
+### Nombre: Nomai
 
-Integrantes: **COMPLETAR ACA**
+### Integrantes:
+- Nombre y apellido: Alejandro Hector Luis
+  - Legajo: 211.477-0
+###
+- Nombre y apellido: Luca Smario Raimondi
+  - Legajo: 220.885-4
+###
+- Nombre y apellido: Ramiro Agustin Silva
+  - Legajo: 204.071-2
+###
+- Nombre y apellido: Francisco Ariel Meaurio
+  - Legajo: 203.836.5
 
 # Consigna TP Integrador
 
@@ -40,8 +51,17 @@ De esa entrega vamos a ayudarles a decidir que agregar para la siguiente entrega
 
 En esta entrega se evaluará el uso de objetos en el tp. Debe haber presente al menos una persona del grupo ese día para la corrección, caso contrario se considera no entregado.
 
-# Juego: NOMBRE
+# Juego: Brujos y Diablos
 
-DESCRIPCION
+## DESCRIPCION
+Brujos y Diablos es un juego del estilo 'survivor', donde el jugador debe eliminar a los enemigos que se van generando hasta deshacerse de cierta cantidad de enemigos mientras los esquiva.
 
-CONTROLES
+## CONDICION DE VICTORIA:
+Obtener cierta cantidad de score al eliminar enemigos.
+
+## CONTROLES:
+- W = Moverse hacia arriba
+- S = Moverse hacia abajo
+- A = Moverse hacia la izquierda
+- D = Moverse hacia la derecha
+- Espacio = Cambiar hechizo

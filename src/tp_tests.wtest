@@ -1,5 +1,261 @@
-import tpIntegrador.*
+import mejoras.*
+import src.enemigos.*
+import src.brujo.*
+import tp.*
+import movimiento.*
 
-test "Test de prueba" {
-	assert.equals(4, 2 + 2)
+describe "Movimiento"{
+	test "Al moverse el jugador hacia una direccion, aumenta su coordenada en 1 hacia esa direccion" {
+		
+		const posicionBrujo = new Position(x=8, y=8)
+		const posicionEsperada = new Position(x=8, y=9)
+		brujo.position(posicionBrujo)
+		brujo.mover(arriba)
+		assert.equals(posicionEsperada,brujo.position())
+	}
+
+	test "Si el jugador intenta moverse fuera del mapa, se frenara en el limite"{
+		randomizador.habilitarTesteo()
+		const posicionBrujo = new Position(x=brujosYdiablos.ancho()-1, y=0)
+		brujo.position(posicionBrujo)
+		brujo.mover(derecha)
+		brujo.mover(derecha)
+		brujo.mover(derecha)
+		assert.equals(posicionBrujo,brujo.position())
+	}
+
+	test "Al moverse un enemigo hacia el jugador, elige la posicion mas cercana a él"{
+		randomizador.habilitarTesteo()
+		const posicionEnemigo = new Position(x = 10, y = 10)
+		const enemigo = generarEnemigo.diablo()
+		enemigo.position(posicionEnemigo)
+
+		const posicionBrujo = new Position(x=4, y=10)
+		brujo.position(posicionBrujo)
+
+		const posicionEsperada = new Position(x=9, y=10)
+		enemigo.moverHacia(brujo)
+
+		assert.equals(posicionEsperada, enemigo.position())
+	}
+
+	test "Al moverse un proyectil hacia su objetivo, elige la posicion mas cercana a él"{
+		randomizador.habilitarTesteo()
+
+		brujo.position(new Position(x=10, y=10))
+
+		const enemigoCercano = generarEnemigo.diablo()
+		enemigoCercano.position(new Position(x = 4, y = 10))
+		const enemigoLejano = generarEnemigo.diablo()
+		enemigoLejano.position(new Position(x = 10, y = 1))
+		const enemigos = [enemigoCercano, enemigoLejano]
+
+		const proyectil = brujo.disparar(enemigos)
+
+		const posicionEsperada = new Position(x=9, y=10)
+		proyectil.mover()
+
+		assert.equals(posicionEsperada, proyectil.position())
+	}
+}
+
+describe "Colisiones"{
+	test "Al chocar el jugador con un enemigo, el enemigo le saca vida al jugador basado en el daño que realiza el enemigo." {
+		randomizador.habilitarTesteo()
+		const enemigo = generarEnemigo.diablo()
+		brujosYdiablos.dificultad(1)
+		brujo.vida(100)
+		enemigo.golpeasteABrujo()
+
+		assert.equals(20, brujo.vida())
+	}
+	test "Al chocar un proyectil con su enemigo fijado, el enemigo pierde vida basado en el daño que realiza el proyectil" {
+		randomizador.habilitarTesteo()
+
+		const enemigo = generarEnemigo.diablo()
+		const enemigos = [enemigo]
+
+		const proyectil = brujo.disparar(enemigos)
+
+		proyectil.golpeasteA(enemigo)
+
+		assert.equals(480, enemigo.vida())
+	}
+	test "Al chocar un proyectil con su enemigo fijado, aumentará el daño que ha realizado el brujo por la cantidad de daño del hechizo" {
+		randomizador.habilitarTesteo()
+
+		const enemigo = generarEnemigo.diablo()
+		const enemigos = [enemigo]
+
+		const proyectil = brujo.disparar(enemigos)
+		const danioDelProyectil = proyectil.danioInflijido()
+
+		proyectil.golpeasteA(enemigo)
+		proyectil.golpeasteA(enemigo)
+
+		assert.equals(danioDelProyectil * 2, brujo.danioRealizado())
+	}
+	test "Al chocar un proyectil con su enemigo fijado, si el enemigo tiene menos o la misma vida que el daño que realiza el proyectil, éste muere" {
+		randomizador.habilitarTesteo()
+
+		const enemigo = generarEnemigo.diablillo() 
+		const enemigos = [enemigo]
+
+		const proyectil = brujo.disparar(enemigos)
+
+		proyectil.golpeasteA(enemigo)
+
+		assert.equals(false, enemigo.estaVivo())
+	}
+	test "Al chocar un proyectil con su enemigo fijado, si el enemigo muere, aumentará el score" {
+		randomizador.habilitarTesteo()
+
+		const enemigo = generarEnemigo.diablillo()
+		const enemigos = [enemigo]
+		const scorePorKill = enemigo.scorePorMuerte()
+
+		const proyectil = brujo.disparar(enemigos)
+
+		proyectil.golpeasteA(enemigo)
+
+		assert.equals(scorePorKill, brujosYdiablos.score())
+	}
+	test "Al chocar un proyectil con su enemigo fijado, el proyectil muere" {
+		randomizador.habilitarTesteo()
+		
+		const enemigo = generarEnemigo.diablo()
+		const enemigos = [enemigo]
+
+		const proyectil = brujo.disparar(enemigos)
+
+		proyectil.golpeasteA(enemigo)
+
+		assert.equals(false, proyectil.estaVivo())
+	}
+}
+
+describe "Magias"{
+	test "Al rotar el tipo de magia seleccionado, se elegirá la siguiente magia. Cercana => Lejana => Aleatoria"{
+		brujo.elegirHechizo(magiaCercana)
+		brujo.rotarHechizo()
+		assert.equals(magiaLejana, brujo.magia())
+		brujo.rotarHechizo()
+		assert.equals(magiaAleatoria, brujo.magia())
+		brujo.rotarHechizo()
+		assert.equals(magiaCercana, brujo.magia())
+	}
+	test "La magia cercana eligirá al enemigo que más cerca esté al brujo."{		
+		const posicionBrujo = new Position(x = 8, y = 8)
+		brujo.position(posicionBrujo)
+		brujo.elegirHechizo(magiaCercana)
+
+		const enemigoCercano = generarEnemigo.diablo()
+		enemigoCercano.position(new Position(x = posicionBrujo.x(), y = posicionBrujo.y() + 1))
+		const enemigoLejano = generarEnemigo.diablo()
+		enemigoLejano.position(new Position(x = posicionBrujo.x() + 100, y = posicionBrujo.y()))
+		const enemigos = [enemigoCercano, enemigoLejano]
+		
+		const proyectil = brujo.disparar(enemigos)
+
+		assert.equals(enemigoCercano, proyectil.objetivo())
+	}
+	test "La magia lejana eligirá al enemigo que más lejos esté al brujo."{
+		const posicionBrujo = new Position(x = 8, y = 8)
+		brujo.position(posicionBrujo)
+		brujo.elegirHechizo(magiaLejana)
+		
+		const enemigoCercano = generarEnemigo.diablo()
+		enemigoCercano.position(new Position(x = posicionBrujo.x(), y = posicionBrujo.y() + 1))
+		const enemigoLejano = generarEnemigo.diablo()
+		enemigoLejano.position(new Position(x = posicionBrujo.x() + 100, y = posicionBrujo.y()))
+		const enemigos = [enemigoCercano, enemigoLejano]
+		
+		const proyectil = brujo.disparar(enemigos)
+
+		assert.equals(enemigoLejano, proyectil.objetivo())
+	}
+	test "La magia aleatoria eligirá a un enemigo aleatorio."{
+		const posicionBrujo = new Position(x = 8, y = 8)
+		brujo.position(posicionBrujo)
+		brujo.elegirHechizo(magiaLejana)
+		
+		const enemigoCercano = generarEnemigo.diablo()
+		enemigoCercano.position(new Position(x = posicionBrujo.x(), y = posicionBrujo.y() + 1))
+		const enemigoLejano = generarEnemigo.diablo()
+		enemigoLejano.position(new Position(x = posicionBrujo.x() + 100, y = posicionBrujo.y()))
+		const enemigos = [enemigoCercano, enemigoLejano]
+		
+		const proyectil = brujo.disparar(enemigos)
+
+		assert.that(enemigos.contains(proyectil.objetivo()))
+	}
+	test "Al aplicarse una mejora a un tipo de magia, cambia la estadistica para los hechizo que lanza"{
+		const danioAntesDeMejorar = magiaCercana.danio()
+		const velocidadAntesDeMejorar = magiaCercana.velocidad()
+		const unaMejora = new MejoraDanio()
+
+		magiaCercana.mejorar(unaMejora)
+
+		assert.notEquals(danioAntesDeMejorar, magiaCercana.danio())
+		
+		const otraMejora = new MejoraVelocidad()
+
+		magiaCercana.mejorar(otraMejora)
+		
+		assert.notEquals(velocidadAntesDeMejorar, magiaCercana.velocidad())
+	}
+}
+
+/* 
+Tipos de Enemigos:
+	hombre lobo:
+		- rareza = comun ; vida = 30 ; daño = 5 ; velocidad = 800
+	diablillo:
+		- rareza = poco-comun ; vida = 15 ; daño = 10 ; velocidad = 300
+	vampiro:
+		- rareza = mini-jefe ; vida = 100 ; daño = 20 ; velocidad = 600
+	diablo:
+		- rareza = jefe ; vida = 500 ; daño = 80 ; velocidad = 1500
+*/
+describe "Enemigos"{
+	test "Un Hombre Lobo tiene de base 30 de vida, 5 de daño y se mueve cada 800ms"{
+		randomizador.habilitarTesteo()
+		const hombreLobo = generarEnemigo.hombreLobo()
+		assert.equals(30, hombreLobo.vida())
+		assert.equals(5, hombreLobo.danioBase())
+		assert.equals(800, hombreLobo.velocidadBase())
+	}
+	test "Un Diablillo tiene de base 50 de vida, 10 de daño y se mueve cada 300ms"{
+		randomizador.habilitarTesteo()
+		const diablillo = generarEnemigo.diablillo()
+		assert.equals(15, diablillo.vida())
+		assert.equals(10, diablillo.danioBase())
+		assert.equals(300, diablillo.velocidadBase())
+	}
+	test "Un Vampiro tiene de base 200 de vida, 20 de daño y se mueve cada 600ms"{
+		randomizador.habilitarTesteo()
+		const vampiro = generarEnemigo.vampiro()
+		assert.equals(100, vampiro.vida())
+		assert.equals(20, vampiro.danioBase())
+		assert.equals(600, vampiro.velocidadBase())
+	}
+	test "Un Diablo tiene de base 500 de vida, 80 de daño y se mueve cada 1500ms"{
+		randomizador.habilitarTesteo()
+		const diablo = generarEnemigo.diablo()
+		assert.equals(500, diablo.vida())
+		assert.equals(80, diablo.danioBase())
+		assert.equals(1500, diablo.velocidadBase())
+	}
+	test "Al cambiar la dificultad, cambia el daño y la velocidad de los enemigos"{
+		brujosYdiablos.dificultad(3)
+
+		const diablillo = generarEnemigo.diablillo()
+		const danioAntesDeCambiarDificultad = diablillo.danio()
+		const velocidadAntesDeCambiarDificultad = diablillo.velocidad()
+		
+		brujosYdiablos.dificultad(5)
+		
+		assert.notEquals(danioAntesDeCambiarDificultad, diablillo.danio())
+		assert.notEquals(velocidadAntesDeCambiarDificultad, diablillo.velocidad())
+	}
 }
