@@ -13,7 +13,12 @@ object textoResultadoFinal{
     var texto = ""
     var colorTexto = color.blanco()
     method victoria(){
-        texto = "¡GANASTE!\n\nTu score fue " + brujosYdiablos.score() + ".\n Realizaste " + brujo.danioRealizado() + " puntos de daño.\nSobreviviste por " + brujosYdiablos.tiempoJugado() + " segundos."
+        texto = 
+            "¡GANASTE!\n\n" + 
+            "Tu score fue " + brujosYdiablos.score() + ".\n" + 
+            "Realizaste " + brujo.danioRealizado() + " puntos de daño.\n" + 
+            "Eliminaste a " brujosYdiablos.cantidadDeEnemigosEliminados() + " enemigos.\n" + 
+            "Sobreviviste por " + brujosYdiablos.tiempoJugado() + " segundos.\n"
         colorTexto = color.verde()
     }
     method derrota(){
@@ -58,6 +63,6 @@ object textoDificultad {
 class TextoMejora {
     const mejora
     method text() = "¡Aumentar " + mejora.tipo() + " por " + mejora.cantidadMejorada() + "!"
-    method textColor() = mejora.color()
+    method textColor() = mejora.colorTexto()
     method position() = brujo.position().up(1)
 }

@@ -27,6 +27,8 @@ class Enemigo{
             }
         }
     }
+    method danioBase() = danio
+    method velocidadBase() = velocidad
     method danio() = danio * brujosYdiablos.dificultad()
     method velocidad() = velocidad / (0.4 * brujosYdiablos.dificultad())
     method morir(){

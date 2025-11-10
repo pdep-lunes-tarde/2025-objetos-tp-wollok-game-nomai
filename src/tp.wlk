@@ -38,6 +38,7 @@ object brujosYdiablos {
     
 
     var property dificultad = 3
+    method limiteDeEnemigos() = dificultad * 5
     method iniciarMenu(){
         game.addVisual(brujo)
 
@@ -57,11 +58,17 @@ object brujosYdiablos {
     const enemigos = []
     var tiempoJugado = 0
     var score = 0
+    var cantidadDeEnemigosEliminados = 0
+    method cantidadDeEnemigosEliminados() = cantidadDeEnemigosEliminados
     method tiempoJugado() = tiempoJugado
     method score() = score
     method aumentarScore(enemigo){
-        if(! enemigo.estaVivo())
+        if(! enemigo.estaVivo()){
+            cantidadDeEnemigosEliminados += 1
+            if(cantidadDeEnemigosEliminados % 5 == 0)
+                brujo.subirDeNivel()
             score += enemigo.scorePorMuerte()
+        }
         if(score >= self.scoreParaGanar())
             self.ganar()
     }
@@ -84,8 +91,8 @@ object brujosYdiablos {
         game.onTick(1000, "tiempo_jugando", { tiempoJugado += 1 })
     }
 
-    method mostrarMejora(mejora){
-        const mejoraMostrada = new TextoMejora(mejora = mejora)
+    method mostrarMejora(unaMejora){
+        const mejoraMostrada = new TextoMejora(mejora = unaMejora)
         game.addVisual(mejoraMostrada)
         game.schedule(1500, {
             game.removeVisual(mejoraMostrada)
@@ -98,7 +105,7 @@ object brujosYdiablos {
             }
         )
         game.addVisual(disparo)
-        game.onTick(200, "movimiento_proyectiles" + disparo.seed(), { disparo.mover() })
+        game.onTick(disparo.velocidad(), "movimiento_proyectiles" + disparo.seed(), { disparo.mover() })
     }
     method removerDisparo(disparo){
         game.removeTickEvent("movimiento_proyectiles" + disparo.seed())
@@ -111,10 +118,12 @@ object brujosYdiablos {
         game.removeVisual(enemigo)
     }
     method agregarEnemigo(enemigo){
-        enemigo.position(randomizador.generarPosicion())
-        game.addVisual(enemigo)
-        enemigos.add(enemigo)
-        game.onTick(enemigo.velocidad(), "movimiento_enemigo" + enemigo.seed(), { enemigo.moverHacia(brujo) })
+        if(enemigos.size() < self.limiteDeEnemigos()){
+            enemigo.position(randomizador.generarPosicion())
+            game.addVisual(enemigo)
+            enemigos.add(enemigo)
+            game.onTick(enemigo.velocidad(), "movimiento_enemigo" + enemigo.seed(), { enemigo.moverHacia(brujo) })
+        }
     }
 
     method finalizar(resultado){
@@ -129,7 +138,7 @@ object brujosYdiablos {
         keyboard.space().onPressDo({ self.reiniciar() })
     }
     method perder(){
-        self.finalizar({texto => texto.derrota()})
+        game.schedule(200, {self.finalizar({texto => texto.derrota()})})
     }
 
     method ganar(){

@@ -1,3 +1,4 @@
+import mejoras.*
 import src.enemigos.*
 import src.brujo.*
 import tp.*
@@ -59,9 +60,10 @@ describe "Movimiento"{
 }
 
 describe "Colisiones"{
-	test "Al chocar el jugador con un enemigo, el enemigo le saca vida al jugador basado en el daño que realiza el enemigo" {
+	test "Al chocar el jugador con un enemigo, el enemigo le saca vida al jugador basado en el daño que realiza el enemigo." {
 		randomizador.habilitarTesteo()
 		const enemigo = generarEnemigo.diablo()
+		brujosYdiablos.dificultad(1)
 		brujo.vida(100)
 		enemigo.golpeasteABrujo()
 
@@ -132,8 +134,8 @@ describe "Colisiones"{
 	}
 }
 
-describe "Hechizos"{
-	test "Al rotar el hechizo, se elegirá el hechizo siguiente. Cercana => Lejana => Aleatoria"{
+describe "Magias"{
+	test "Al rotar el tipo de magia seleccionado, se elegirá la siguiente magia. Cercana => Lejana => Aleatoria"{
 		brujo.elegirHechizo(magiaCercana)
 		brujo.rotarHechizo()
 		assert.equals(magiaLejana, brujo.magia())
@@ -172,6 +174,36 @@ describe "Hechizos"{
 
 		assert.equals(enemigoLejano, proyectil.objetivo())
 	}
+	test "La magia aleatoria eligirá a un enemigo aleatorio."{
+		const posicionBrujo = new Position(x = 8, y = 8)
+		brujo.position(posicionBrujo)
+		brujo.elegirHechizo(magiaLejana)
+		
+		const enemigoCercano = generarEnemigo.diablo()
+		enemigoCercano.position(new Position(x = posicionBrujo.x(), y = posicionBrujo.y() + 1))
+		const enemigoLejano = generarEnemigo.diablo()
+		enemigoLejano.position(new Position(x = posicionBrujo.x() + 100, y = posicionBrujo.y()))
+		const enemigos = [enemigoCercano, enemigoLejano]
+		
+		const proyectil = brujo.disparar(enemigos)
+
+		assert.that(enemigos.contains(proyectil.objetivo()))
+	}
+	test "Al aplicarse una mejora a un tipo de magia, cambia la estadistica para los hechizo que lanza"{
+		const danioAntesDeMejorar = magiaCercana.danio()
+		const velocidadAntesDeMejorar = magiaCercana.velocidad()
+		const unaMejora = new MejoraDanio()
+
+		magiaCercana.mejorar(unaMejora)
+
+		assert.notEquals(danioAntesDeMejorar, magiaCercana.danio())
+		
+		const otraMejora = new MejoraVelocidad()
+
+		magiaCercana.mejorar(otraMejora)
+		
+		assert.notEquals(velocidadAntesDeMejorar, magiaCercana.velocidad())
+	}
 }
 
 /* 
@@ -186,32 +218,44 @@ Tipos de Enemigos:
 		- rareza = jefe ; vida = 500 ; daño = 80 ; velocidad = 1500
 */
 describe "Enemigos"{
-	test "Un Hombre Lobo tiene 30 de vida, 5 de daño y se mueve cada 800ms"{
+	test "Un Hombre Lobo tiene de base 30 de vida, 5 de daño y se mueve cada 800ms"{
 		randomizador.habilitarTesteo()
 		const hombreLobo = generarEnemigo.hombreLobo()
 		assert.equals(30, hombreLobo.vida())
-		assert.equals(5, hombreLobo.danio())
-		assert.equals(800, hombreLobo.velocidad())
+		assert.equals(5, hombreLobo.danioBase())
+		assert.equals(800, hombreLobo.velocidadBase())
 	}
-	test "Un Diablillo tiene 50 de vida, 10 de daño y se mueve cada 300ms"{
+	test "Un Diablillo tiene de base 50 de vida, 10 de daño y se mueve cada 300ms"{
 		randomizador.habilitarTesteo()
 		const diablillo = generarEnemigo.diablillo()
 		assert.equals(15, diablillo.vida())
-		assert.equals(10, diablillo.danio())
-		assert.equals(300, diablillo.velocidad())
+		assert.equals(10, diablillo.danioBase())
+		assert.equals(300, diablillo.velocidadBase())
 	}
-	test "Un Vampiro tiene 200 de vida, 20 de daño y se mueve cada 600ms"{
+	test "Un Vampiro tiene de base 200 de vida, 20 de daño y se mueve cada 600ms"{
 		randomizador.habilitarTesteo()
 		const vampiro = generarEnemigo.vampiro()
 		assert.equals(100, vampiro.vida())
-		assert.equals(20, vampiro.danio())
-		assert.equals(600, vampiro.velocidad())
+		assert.equals(20, vampiro.danioBase())
+		assert.equals(600, vampiro.velocidadBase())
 	}
-	test "Un Diablo tiene 500 de vida, 80 de daño y se mueve cada 1500ms"{
+	test "Un Diablo tiene de base 500 de vida, 80 de daño y se mueve cada 1500ms"{
 		randomizador.habilitarTesteo()
 		const diablo = generarEnemigo.diablo()
 		assert.equals(500, diablo.vida())
-		assert.equals(80, diablo.danio())
-		assert.equals(1500, diablo.velocidad())
+		assert.equals(80, diablo.danioBase())
+		assert.equals(1500, diablo.velocidadBase())
+	}
+	test "Al cambiar la dificultad, cambia el daño y la velocidad de los enemigos"{
+		brujosYdiablos.dificultad(3)
+
+		const diablillo = generarEnemigo.diablillo()
+		const danioAntesDeCambiarDificultad = diablillo.danio()
+		const velocidadAntesDeCambiarDificultad = diablillo.velocidad()
+		
+		brujosYdiablos.dificultad(5)
+		
+		assert.notEquals(danioAntesDeCambiarDificultad, diablillo.danio())
+		assert.notEquals(velocidadAntesDeCambiarDificultad, diablillo.velocidad())
 	}
 }
